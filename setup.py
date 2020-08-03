@@ -19,7 +19,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     url="https://github.com/joeyhoek/Clappform-Python-Connector",
-    download_url = 'https://github.com/joeyhoek/Clappform-Python-Connector/archive/production.tar.gz', 
+    download_url = 'https://github.com/joeyhoek/Clappform-Python-Connector/archive/1.0.3.tar.gz', 
     author="JoeyHoek",
     author_email="j.hoek@clappform.com",
     keywords="api connector",
