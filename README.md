@@ -21,7 +21,7 @@ Now the interface is accessible in your code by prefixing with 'Clappform'. The 
 All authentication is handled by the Auth class. The Auth class is exposed through Clappform and needs to be initiated before any other commands, all authentication afterwards will be handled (including refreshing the token). Three parameters are needed: the base URL of the environment to authenticate towards (ex. https://dev.clappform.com/), the username and the password. The class has more exposed function, but those are only needed for the handler.
 
 ```python
-Clappform.Auth(baseURL="https://dev.clappform.com/", username="info@clappform.com", password="test")
+Clappform.Auth(baseURL="https://dev.clappform.com/", username="test@clappform.com", password="test")
 ```
 
 **NOTE:** *It's strongly recommended to create per environment a seperate user for the importing scripts* 
@@ -221,7 +221,7 @@ Clappform.Notification(1).ReadOne()
 The Create() function returns an instance of the Notification class containing the correct id if the notification has been created, otherwise it will raise an exception. For instance an exception will be thrown if the value types are wrong. The required parameters are: user, content and url (String, relative path to page opened on opening the notification).
 
 ```python
-Clappform.Notification.Create(user='d.tolen@clappform.com', content='Data has been updated', url='/app/test_app')
+Clappform.Notification.Create(user='test@clappform.com', content='Data has been updated', url='/app/test_app')
 ```
 
 ### Update
@@ -257,7 +257,7 @@ Clappform.Email(1).ReadOne()
 The Create() function returns an instance of the Email class containing the correct id if the email has been sent, otherwise it will raise an exception. For instance an exception will be thrown if the user couldn't be found. The required parameters are: user, subject and content.
 
 ```python
-Clappform.Email.Create(user='d.tolen@clappform.com', subject='Data Updated', content='Dear ..., The data has been updated.')
+Clappform.Email.Create(user='test@clappform.com', subject='Data Updated', content='Dear ..., The data has been updated.')
 ```
 
 ## SMS
@@ -279,7 +279,7 @@ Clappform.SMS(1).ReadOne()
 The Create() function returns an instance of the SMS class containing the correct id if the SMS message has been sent, otherwise it will raise an exception. For instance an exception will be thrown if the user couldn't be found. The required parameters are: user and content.
 
 ```python
-Clappform.SMS.Create(user='d.tolen@clappform.com', content='Data has been updated')
+Clappform.SMS.Create(user='test@clappform.com', content='Data has been updated')
 ```
 
 
@@ -302,7 +302,7 @@ Clappform.Whatsapp(1).ReadOne()
 The Create() function returns an instance of the Whatsapp class containing the correct id if the Whatsapp message has been sent, otherwise it will raise an exception. For instance an exception will be thrown if the user couldn't be found. The required parameters are: user and content.
 
 ```python
-Clappform.Whatsapp.Create(user='d.tolen@clappform.com', content='Data has been updated')
+Clappform.Whatsapp.Create(user='test@clappform.com', content='Data has been updated')
 ```
 
 ## Settings
