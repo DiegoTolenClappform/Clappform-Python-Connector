@@ -185,7 +185,7 @@ Clappform.Task(1).ReadOne(extended=True)
 The Create() function returns an instance of the Task class containing the correct id if the task has been created, otherwise it will raise an exception. For instance an exception will be thrown if the value types are wrong. The required parameters are: user, name and description. Optional parameters are: due_date (String), completed (Boolean, default: False), archived (Boolean, default: False).
 
 ```python
-Clappform.Task.Create(user='info@clappform.com', name='Validate the data', description='The data needs to be validated before it gets updated.')
+Clappform.Task.Create(user='test@clappform.com', name='Validate the data', description='The data needs to be validated before it gets updated.')
 ```
 
 ### Update
