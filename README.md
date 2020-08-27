@@ -74,42 +74,42 @@ Clappform.App("test_app").Collection("test_collection")
 
 ### Collection
 ### ReadOne
-The ReadOne() function returns a JSON object with the requested collection. It's id needs to have been passed to the class in order to read the collection. An exception will be raised upon not finding the collection. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the items in the collection.
+The ReadOne() function returns a JSON object with the requested collection. It's slug needs to have been passed to the class in order to read the collection. An exception will be raised upon not finding the collection. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the items in the collection.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").ReadOne(extended=True)
 ```
 
 ### Create
-The Create() function returns an instance of the Collection class containing the correct id if the collection has been created, otherwise it will raise an exception. For instance an exception will be thrown if the collection already exists. The required parameters are: id (Unique, lowercase and separation by underscores), name, description and encryption (Boolean, preferably off for performance but must be on if it will contain personal data).
+The Create() function returns an instance of the Collection class containing the correct slug if the collection has been created, otherwise it will raise an exception. For instance an exception will be thrown if the collection already exists. The required parameters are: id (Unique, lowercase and separation by underscores), name, description and encryption (Boolean, preferably off for performance but must be on if it will contain personal data).
 
 ```python
-Clappform.App("test_app").Collection().Create(id="test_collection", name="Test Collection", description="This collections store ... data.", encryption=True)
+Clappform.App("test_app").Collection().Create(slug="test_collection", name="Test Collection", encryption=True)
 ```
 
 ### Update
-The Update() function returns an instance of the Collection class containing the correct id if the collection has been updated successfully, otherwise it will raise an exception. For instance an exception will be thrown if the collection couldn't be found. The collection's id needs to have been passed to the class in order to update the collection. The optional parameters are: name, description and encryption (Boolean)).
+The Update() function returns an instance of the Collection class containing the correct slug if the collection has been updated successfully, otherwise it will raise an exception. For instance an exception will be thrown if the collection couldn't be found. The collection's slug needs to have been passed to the class in order to update the collection. The optional parameters are: name, description and encryption (Boolean)).
 
 ```python
 Clappform.App("test_app").Collection("test_collection").Create(name="Collection")
 ```
 
 ### Delete
-The Delete() function returns True upon successful deletion and raises an exception otherwise. For instance an exception will be thrown if the collection couldn't be found. The collection's id needs to have been passed to the class in order to delete the collection.
+The Delete() function returns True upon successful deletion and raises an exception otherwise. For instance an exception will be thrown if the collection couldn't be found. The collection's slug needs to have been passed to the class in order to delete the collection.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").Delete()
 ```
 
 ### Empty
-The Empty() function returns True upon successful emptying the collection and raises an exception otherwise. The collection's id needs to have been passed to the class in order to empty the collection.
+The Empty() function returns True upon successful emptying the collection and raises an exception otherwise. The collection's slug needs to have been passed to the class in order to empty the collection.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").Empty()
 ```
 
 ### Item
-The Item() function returns an instance of the Collection class. An item's id can be passed to be able to read, update or delete a specific item. The collection's id needs to have been passed to the collection class in order to create an instance of an item.
+The Item() function returns an instance of the Collection class. An item's id can be passed to be able to read, update or delete a specific item. The collection's slug needs to have been passed to the collection class in order to create an instance of an item.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").item("test_item")
@@ -153,17 +153,24 @@ Clappform.App("test_app").Collection("test_collection").Item("test_item").Delete
 
 ## DataFrame
 ### Read
-The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's id needs to have been passed to the collection class in order to retrieve the dataframe.
+The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").DataFrame().Read()
 ```
 
 ### Synchronize
-The Synchronize() function returns True if the dataframe has been synchronized with the collection successfully. The collection's id needs to have been passed to the collection class in order to retrieve the dataframe. The collection will **only** contain the data from the dataframe. The only parameter is: 'dataframe' and is required to have a pandas dataframe.
+The Synchronize() function returns True if the dataframe has been synchronized with the collection successfully. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. The collection will **only** contain the data from the dataframe. The maximum json size to be send is **5MB**, use the Append() method as an alternative. The only parameter is: 'dataframe' and is required to have a pandas dataframe.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").DataFrame().Synchronize(dataframe=df)
+```
+
+### Append
+The Append() function returns True if all the data has been added to the collection successfully. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. The collection will **only** add the data from the dataframe. The maximum json size to be send is **5MB**, use the Append() method as an alternative. The only parameter is: 'dataframe' and is required to have a pandas dataframe.
+
+```python
+Clappform.App("test_app").Collection("test_collection").DataFrame().Append(dataframe=df)
 ```
 
 ## Task
