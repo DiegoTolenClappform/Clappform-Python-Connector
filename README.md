@@ -153,10 +153,10 @@ Clappform.App("test_app").Collection("test_collection").Item("test_item").Delete
 
 ## DataFrame
 ### Read
-The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe.
+The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. Run ColumnEqualizer if column_equalizer=True before reading the dataframe.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").DataFrame().Read()
+Clappform.App("test_app").Collection("test_collection").DataFrame().Read(column_equalizer=False)
 ```
 
 ### Synchronize
@@ -172,6 +172,13 @@ The Append() function returns True if all the data has been added to the collect
 ```python
 Clappform.App("test_app").Collection("test_collection").DataFrame().Append(dataframe=df)
 ```
+### ColumnEqualizer
+The ColumnEqualizer() function returns True if NaN values are filled in for missing columns. The collection's slug needs to have been passed to the collection class in order to execute this function. 
+
+```python
+Clappform.App("test_app").Collection("test_collection").DataFrame().ColumnEqualizer()
+```
+
 
 ## Task
 ### Read
