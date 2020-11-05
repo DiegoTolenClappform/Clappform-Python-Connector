@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="Clappform",
-    version="1.2.0",
+    version="1.2.1",
     description="Clappform API Connector",
     long_description=readme(),
     long_description_content_type="text/markdown",
