@@ -14,38 +14,7 @@ class _DataFrame:
         self.collection_id = collection
 
 
-    def Read(self, equalize_columns=False):
-
-        if equalize_columns:
-            
-            self.ColumnEqualizer()
-
-        if not Auth.tokenValid():
-            Auth.refreshToken()
-
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id, headers={
-            'Authorization': 'Bearer ' + settings.token
-        })
-
-        data = []
-        columns = []
-        indices = list(range(0, response.json()["data"]["items"]))
-
-        loopCount = math.ceil(response.json()["data"]["items"] / 500)
-        for x in range(0, loopCount):
-            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(x * 500), headers={
-                'Authorization': 'Bearer ' + settings.token
-            })
-
-            if x is 0:
-                columns = list(response.json()["data"]["items"][0]["data"].keys())
-
-            for item in response.json()["data"]["items"]:
-                data.append(list(item["data"].values()))
-
-        return pd.DataFrame(data, index=indices, columns=columns)
-
-    def ColumnEqualizer(self):
+    def Read(self):
 
         if not Auth.tokenValid():
             Auth.refreshToken()
@@ -65,13 +34,8 @@ class _DataFrame:
             for item in response.json()["data"]["items"]:
                 data.append(item["data"])
 
-        df = pd.DataFrame(data)
+        return pd.DataFrame(data)
 
-        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.collection_id + '/dataframe', headers={'Authorization': 'Bearer ' + settings.token})
-
-        self.Append(df)
-
-        return True
         
     def Synchronize(self, dataframe):
         if not Auth.tokenValid():
