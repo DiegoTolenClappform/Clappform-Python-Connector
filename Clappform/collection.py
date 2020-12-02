@@ -34,13 +34,14 @@ class _Collection:
             raise Exception(response.json()["message"])
         
 
-    def Create(self, slug, name, encryption):
+    def Create(self, slug, name, description, encryption):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         response = requests.post(settings.baseURL + 'api/metric/' + self.app_id, json={
             'slug': slug,
             'name': name,
+            'description': description,
             'encryption': encryption
         }, headers={
             'Authorization': 'Bearer ' + settings.token
@@ -52,7 +53,7 @@ class _Collection:
             raise Exception(response.json()["message"])
 
 
-    def Update(self, slug = None, name = None, encryption = None):
+    def Update(self, slug = None, name = None, description = None, encryption = None):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -62,6 +63,9 @@ class _Collection:
 
         if slug is not None:
             properties["slug"] = slug
+
+        if description is not None:
+            properties["description"] = description
 
         if encryption is not None:
             properties["encryption"] = encryption
