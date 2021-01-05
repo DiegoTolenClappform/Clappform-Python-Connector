@@ -14,22 +14,18 @@ class _DataFrame:
         self.collection_id = collection
 
 
-    def Read(self):
-
+    def Read(self, original = True):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id, headers={
-            'Authorization': 'Bearer ' + settings.token
-        })
-
         data = []
 
-        loopCount = math.ceil(response.json()["data"]["items"] / 500)
+        loopCount = 1
         for x in range(0, loopCount):
-            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(x * 500), headers={
+            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(x * 500) + '&original=' str(original), headers={
                 'Authorization': 'Bearer ' + settings.token
             })
+            loopCount = math.ceil(response.json()["total"] / 500)
 
             for item in response.json()["data"]["items"]:
                 data.append(item["data"])
@@ -94,3 +90,28 @@ class _DataFrame:
             count += 1
 
         return True
+
+    
+    def Query(self, filters = {}, projection = {}, sorting = {}, original = True):
+        if not Auth.tokenValid():
+            Auth.refreshToken()
+
+        data = []
+
+        loopCount = 1
+        for x in range(0, loopCount):
+            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(x * 500) + '&original=' str(original), json={
+                "app": self.app_id,
+                "collection": self.collection_id,
+                "filter": filters,
+                "projection": projection,
+                "sorting": sorting
+            }, headers={
+                'Authorization': 'Bearer ' + settings.token
+            })
+            loopCount = math.ceil(response.json()["total"] / 500)
+
+            for item in response.json()["data"]["items"]:
+                data.append(item["data"])
+
+        return pd.DataFrame(data)

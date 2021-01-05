@@ -13,11 +13,11 @@ class _Item:
         self.id = item
 
 
-    def ReadOne(self):
+    def ReadOne(self, original = True):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.collection_id + '/' + self.id, headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.collection_id + '/' + self.id + '?original=' str(original), headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] is 200:
             return response.json()["data"]
