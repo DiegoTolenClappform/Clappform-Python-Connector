@@ -74,10 +74,10 @@ Clappform.App("test_app").Collection("test_collection")
 
 ### Collection
 ### ReadOne
-The ReadOne() function returns a JSON object with the requested collection. It's slug needs to have been passed to the class in order to read the collection. An exception will be raised upon not finding the collection. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the items in the collection.
+The ReadOne() function returns a JSON object with the requested collection. It's slug needs to have been passed to the class in order to read the collection. An exception will be raised upon not finding the collection. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the items in the collection. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").ReadOne(extended=True)
+Clappform.App("test_app").Collection("test_collection").ReadOne(extended=True, Original=True)
 ```
 
 ### Create
@@ -108,6 +108,27 @@ The Empty() function returns True upon successful emptying the collection and ra
 Clappform.App("test_app").Collection("test_collection").Empty()
 ```
 
+### Query
+The Query() function returns a pandas dataframe with the data matching specified conditions stored in the collection. The options follow the MongoDB documentation. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
+
+```python
+Clappform.App("test_app").Collection("test_collection").Query(filters={}, projection={}, sorting={}, original=True)
+```
+
+### Lock
+The Lock() function returns True upon success. It duplicates the current collection so one can be read by the user whilst the new one is being worked at. The new data can be read by using the parameter Original and setting it to equal false for the read function being used. The collection's slug needs to have been passed to the class in order to empty the collection.
+
+```python
+Clappform.App("test_app").Collection("test_collection").Lock()
+```
+
+### Unlock
+The Unlock() function True returns upon success. It removes the duplicate created by the Lock() function. After running this function all the changes that have been made to the collection will be served to the users. The collection's slug needs to have been passed to the class in order to empty the collection.
+
+```python
+Clappform.App("test_app").Collection("test_collection").Unlock()
+```
+
 ### Item
 The Item() function returns an instance of the Collection class. An item's id can be passed to be able to read, update or delete a specific item. The collection's slug needs to have been passed to the collection class in order to create an instance of an item.
 
@@ -124,10 +145,10 @@ Clappform.App("test_app").Collection("test_collection").DataFrame()
 
 ## Item
 ### ReadOne
-The ReadOne() function returns a JSON object with the requested item. It's id needs to have been passed to the class in order to read the item. An exception will be raised upon not finding the item.
+The ReadOne() function returns a JSON object with the requested item. It's id needs to have been passed to the class in order to read the item. An exception will be raised upon not finding the item. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").Item("test_item").ReadOne()
+Clappform.App("test_app").Collection("test_collection").Item("test_item").ReadOne(Original=True)
 ```
 
 ### Create
@@ -153,10 +174,10 @@ Clappform.App("test_app").Collection("test_collection").Item("test_item").Delete
 
 ## DataFrame
 ### Read
-The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. 
+The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").DataFrame().Read()
+Clappform.App("test_app").Collection("test_collection").DataFrame().Read(Original=True)
 ```
 
 ### Synchronize
@@ -171,6 +192,13 @@ The Append() function returns True if all the data has been added to the collect
 
 ```python
 Clappform.App("test_app").Collection("test_collection").DataFrame().Append(dataframe=df)
+```
+
+### Query
+The Query() function returns a pandas dataframe with the data matching specified conditions stored in the collection. The options follow the MongoDB documentation. It is necessary to have all columns (except id) in the data property if changing the projection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
+
+```python
+Clappform.App("test_app").Collection("test_collection").DataFrame().Query(filters={}, projection={}, sorting={}, original=True)
 ```
 
 ## Task
