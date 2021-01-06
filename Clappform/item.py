@@ -17,7 +17,7 @@ class _Item:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.collection_id + '/' + self.id + '?original=' str(original), headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.collection_id + '/' + self.id + '?original=' + str(original), headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] is 200:
             return response.json()["data"]

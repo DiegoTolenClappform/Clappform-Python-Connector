@@ -22,7 +22,7 @@ class _DataFrame:
 
         loopCount = 1
         for x in range(0, loopCount):
-            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(x * 500) + '&original=' str(original), headers={
+            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(x * 500) + '&original=' + str(original), headers={
                 'Authorization': 'Bearer ' + settings.token
             })
             loopCount = math.ceil(response.json()["total"] / 500)
@@ -100,7 +100,7 @@ class _DataFrame:
 
         loopCount = 1
         for x in range(0, loopCount):
-            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(x * 500) + '&original=' str(original), json={
+            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(x * 500) + '&original=' + str(original), json={
                 "app": self.app_id,
                 "collection": self.collection_id,
                 "filter": filters,

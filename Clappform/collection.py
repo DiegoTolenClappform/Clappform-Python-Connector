@@ -26,7 +26,7 @@ class _Collection:
             Auth.refreshToken()
 
         extended = str(extended).lower()
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '?extended=' + extended + '&original=' str(original), headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '?extended=' + extended + '&original=' + str(original), headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] is 200:
             return response.json()["data"]
@@ -140,7 +140,7 @@ class _Collection:
 
         loopCount = 1
         for x in range(0, loopCount):
-            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(x * 500) + '&original=' str(original), json={
+            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(x * 500) + '&original=' + str(original), json={
                 "app": self.app_id,
                 "collection": self.id,
                 "filter": filters,
