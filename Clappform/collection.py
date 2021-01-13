@@ -3,6 +3,8 @@ from .dataFrame import _DataFrame
 from .item import _Item
 from .auth import Auth
 import requests
+import math
+import pandas as pd
 
 class _Collection:
     app_id = None
@@ -26,15 +28,38 @@ class _Collection:
             Auth.refreshToken()
 
         extended = str(extended).lower()
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '?extended=' + extended + '&original=' + str(original), headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '?extended=' + extended + '&original=' + str(original).lower(), headers={'Authorization': 'Bearer ' + settings.token})
 
-        if response.json()["code"] is 200:
-            return response.json()["data"]
-        else:
+        if response.json()["code"] is not 200:
             raise Exception(response.json()["message"])
+
+        result = response.json()
+
+        if extended == True:
+            print(extended)
+            data = []
+
+            currentLoop = 0
+            maxLoops = 1
+            while currentLoop < maxLoops:
+                response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '?extended=true&offset=' + str(currentLoop * 500) + '&original=' + str(original).lower(), headers={
+                    'Authorization': 'Bearer ' + settings.token
+                })
+
+                if "total" in response.json().keys():
+                    maxLoops = math.ceil(response.json()["total"] / 500)
+
+                    for item in response.json()["data"]["items"]:
+                        data.append(item["data"])
+                
+                currentLoop += 1
+
+            result["data"] = data
+        
+        return result
         
 
-    def Create(self, slug, name, description, encryption):
+    def Create(self, slug, name, description, encryption, logging, sources = []):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -42,7 +67,9 @@ class _Collection:
             'slug': slug,
             'name': name,
             'description': description,
-            'encryption': encryption
+            'encryption': encryption,
+            'logged': logging,
+            'sources': sources
         }, headers={
             'Authorization': 'Bearer ' + settings.token
         })
@@ -53,7 +80,7 @@ class _Collection:
             raise Exception(response.json()["message"])
 
 
-    def Update(self, slug = None, name = None, description = None, encryption = None):
+    def Update(self, slug = None, name = None, description = None, encryption = None, logging = None, sources = None):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -70,7 +97,13 @@ class _Collection:
         if encryption is not None:
             properties["encryption"] = encryption
 
-        response = requests.post(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json=properties, headers={
+        if logging is not None:
+            properties["is_logged"] = logging
+
+        if sources is not None:
+            properties["sources"] = sources
+
+        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json=properties, headers={
             'Authorization': 'Bearer ' + settings.token
         })
 
@@ -108,7 +141,7 @@ class _Collection:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.post(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={ "lock": True }, headers={
+        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={ "locked": True }, headers={
             'Authorization': 'Bearer ' + settings.token
         })
 
@@ -122,7 +155,7 @@ class _Collection:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.post(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={ "lock": False }, headers={
+        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={ "locked": False }, headers={
             'Authorization': 'Bearer ' + settings.token
         })
 
@@ -138,9 +171,10 @@ class _Collection:
 
         data = []
 
-        loopCount = 1
-        for x in range(0, loopCount):
-            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(x * 500) + '&original=' + str(original), json={
+        currentLoop = 0
+        maxLoops = 1
+        while currentLoop < maxLoops:
+            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(currentLoop * 500) + '&original=' + str(original).lower(), json={
                 "app": self.app_id,
                 "collection": self.id,
                 "filter": filters,
@@ -149,9 +183,13 @@ class _Collection:
             }, headers={
                 'Authorization': 'Bearer ' + settings.token
             })
-            loopCount = math.ceil(response.json()["total"] / 500)
 
-            for item in response.json()["data"]["items"]:
-                data.append(item["data"])
+            if "total" in response.json().keys():
+                maxLoops = math.ceil(response.json()["total"] / 500)
 
-        return pd.DataFrame(data)
+                for item in response.json()["data"]:
+                    data.append(item["data"])
+
+            currentLoop += 1
+
+        return data

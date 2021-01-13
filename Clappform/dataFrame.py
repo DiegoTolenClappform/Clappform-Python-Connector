@@ -20,15 +20,20 @@ class _DataFrame:
 
         data = []
 
-        loopCount = 1
-        for x in range(0, loopCount):
-            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(x * 500) + '&original=' + str(original), headers={
+        currentLoop = 0
+        maxLoops = 1
+        while currentLoop < maxLoops:
+            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(currentLoop * 500) + '&original=' + str(original).lower(), headers={
                 'Authorization': 'Bearer ' + settings.token
             })
-            loopCount = math.ceil(response.json()["total"] / 500)
+            
+            if "total" in response.json().keys():
+                maxLoops = math.ceil(response.json()["total"] / 500)
 
-            for item in response.json()["data"]["items"]:
-                data.append(item["data"])
+                for item in response.json()["data"]["items"]:
+                    data.append(item["data"])
+            
+            currentLoop += 1
 
         return pd.DataFrame(data)
 
@@ -98,9 +103,10 @@ class _DataFrame:
 
         data = []
 
-        loopCount = 1
-        for x in range(0, loopCount):
-            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(x * 500) + '&original=' + str(original), json={
+        currentLoop = 0
+        maxLoops = 1
+        while currentLoop < maxLoops:
+            response = requests.post(settings.baseURL + 'api/metric/query?offset=' + str(currentLoop * 500) + '&original=' + str(original).lower(), json={
                 "app": self.app_id,
                 "collection": self.collection_id,
                 "filter": filters,
@@ -109,9 +115,13 @@ class _DataFrame:
             }, headers={
                 'Authorization': 'Bearer ' + settings.token
             })
-            loopCount = math.ceil(response.json()["total"] / 500)
 
-            for item in response.json()["data"]["items"]:
-                data.append(item["data"])
+            if "total" in response.json().keys():
+                maxLoops = math.ceil(response.json()["total"] / 500)
+
+                for item in response.json()["data"]:
+                    data.append(item["data"])
+
+            currentLoop += 1
 
         return pd.DataFrame(data)

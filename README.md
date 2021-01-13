@@ -81,17 +81,17 @@ Clappform.App("test_app").Collection("test_collection").ReadOne(extended=True, O
 ```
 
 ### Create
-The Create() function returns an instance of the Collection class containing the correct slug if the collection has been created, otherwise it will raise an exception. For instance an exception will be thrown if the collection already exists. The required parameters are: id (Unique, lowercase and separation by underscores), name, description and encryption (Boolean, preferably off for performance but must be on if it will contain personal data).
+The Create() function returns an instance of the Collection class containing the correct slug if the collection has been created, otherwise it will raise an exception. For instance an exception will be thrown if the collection already exists. The required parameters are: id (Unique, lowercase and separation by underscores), name, description, encryption (Boolean, preferably off for performance but must be on if it will contain personal data), logging (Boolean, Set to true if the collection needs to be logged in the admin panel, we suggest setting this to true if all changes to the collection needs to be tracked) and sources (list of resources used from where the data in the collection was gathered, defaults to an empty array).
 
 ```python
-Clappform.App("test_app").Collection().Create(slug="test_collection", name="Test Collection", encryption=True)
+Clappform.App("test_app").Collection().Create(slug="test_collection", name="Test Collection", description="This collection stores data about ... and is used in ...", encryption=True, logging=True, sources=[{ "name": "Online resource", "link": "https://www.example.com/" }, "Name without link"])
 ```
 
 ### Update
-The Update() function returns an instance of the Collection class containing the correct slug if the collection has been updated successfully, otherwise it will raise an exception. For instance an exception will be thrown if the collection couldn't be found. The collection's slug needs to have been passed to the class in order to update the collection. The optional parameters are: name, description and encryption (Boolean)).
+The Update() function returns an instance of the Collection class containing the correct slug if the collection has been updated successfully, otherwise it will raise an exception. For instance an exception will be thrown if the collection couldn't be found. The collection's slug needs to have been passed to the class in order to update the collection. The optional parameters are: name, description, encryption (Boolean)), logging (Boolean, Set to true if the collection needs to be logged in the admin panel, we suggest setting this to true if all changes to the collection needs to be tracked) and sources (list of resources used from where the data in the collection was gathered).
 
 ```python
-Clappform.App("test_app").Collection("test_collection").Create(name="Collection")
+Clappform.App("test_app").Collection("test_collection").Update(name="Collection")
 ```
 
 ### Delete
@@ -199,42 +199,6 @@ The Query() function returns a pandas dataframe with the data matching specified
 
 ```python
 Clappform.App("test_app").Collection("test_collection").DataFrame().Query(filters={}, projection={}, sorting={}, original=True)
-```
-
-## Task
-### Read
-The Read() function returns an JSON array with all the tasks known to this Clappform instance. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the users related to the task.
-
-```python
-Clappform.Task.Read(extended=True)
-```
-
-### ReadOne
-The ReadOne() function returns a JSON object with the requested task. It's id needs to have been passed to the class in order to read the task. An exception will be raised upon not finding the task. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the user related to the task.
-
-```python
-Clappform.Task(1).ReadOne(extended=True)
-```
-
-### Create
-The Create() function returns an instance of the Task class containing the correct id if the task has been created, otherwise it will raise an exception. For instance an exception will be thrown if the value types are wrong. The required parameters are: user, name and description. Optional parameters are: due_date (String), completed (Boolean, default: False), archived (Boolean, default: False).
-
-```python
-Clappform.Task.Create(user='test@clappform.com', name='Validate the data', description='The data needs to be validated before it gets updated.')
-```
-
-### Update
-The Update() function returns an instance of the Task class containing the correct id if the task has been updated, otherwise it will raise an exception. For instance an exception will be thrown if the value types are wrong. Optional parameters are: user, name, description, due_date (String), completed (Boolean, default: False), archived (Boolean, default: False).
-
-```python
-Clappform.Task(1).Update(completed=True)
-```
-
-### Delete
-The Delete() function returns True upon successful deletion and raises an exception otherwise. For instance an exception will be thrown if the task couldn't be found. The task's id needs to have been passed to the class in order to delete the task.
-
-```python
-Clappform.Task(1).Delete()
 ```
 
 ## Notification
