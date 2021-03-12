@@ -4,6 +4,8 @@ import json
 import requests
 import math
 from .auth import Auth
+from sys import getsizeof
+import math
 
 class _DataFrame:
     app_id = None
@@ -14,7 +16,7 @@ class _DataFrame:
         self.collection_id = collection
 
 
-    def Read(self, original = True):
+    def Read(self, original = True, itemsPerRun = 500):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -23,12 +25,12 @@ class _DataFrame:
         currentLoop = 0
         maxLoops = 1
         while currentLoop < maxLoops:
-            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(currentLoop * 500) + '&original=' + str(original).lower(), headers={
+            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(currentLoop * itemsPerRun) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower(), headers={
                 'Authorization': 'Bearer ' + settings.token
             })
             
             if "total" in response.json().keys():
-                maxLoops = math.ceil(response.json()["total"] / 500)
+                maxLoops = math.ceil(response.json()["total"] / itemsPerRun)
 
                 for item in response.json()["data"]["items"]:
                     data.append(item["data"])
@@ -64,28 +66,34 @@ class _DataFrame:
         if 'index' in dataframe:
             dataframe = dataframe.drop(columns=["index"])
 
+        amountToSent = 100
+        limit = 5000000 * 0.95 / 8
+
+        averageSize = getsizeof(dataframe.to_json(orient="index")) / len(dataframe.index)
+        amountSent = amountSent if ((limit / averageSize) > amountToSent) else int(math.floor(limit / averageSize))
+
         offset = response.json()["data"]["items"]
         count = 0
         for x in range(0 + offset, len(dataframe.index) + offset):
-            if (count + 1) % 100 is 0:
-                portion = dataframe.iloc[x - 99 - offset:x + 1 - offset]
+            if (count + 1) % amountSent is 0:
+                portion = dataframe.iloc[x - (amountSent - 1) - offset:x + 1 - offset]
                 portion.reset_index(inplace=True, drop=True)
                 if 'index' in portion:
                      portion = portion.drop(columns=["index"])
                 
-                portion.index += offset + count - 99
+                portion.index += offset + count - (amountSent - 1)
                 items = json.loads(portion.to_json(orient='index'))
                 
                 response = requests.post(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe', json=items, headers={
                     'Authorization': 'Bearer ' + settings.token
                 })
             elif len(dataframe.index) + offset == x + 1:
-                portion = dataframe.tail(len(dataframe.index) - int(math.floor(len(dataframe.index) / 100.0)) * 100)
+                portion = dataframe.tail(len(dataframe.index) - int(math.floor(len(dataframe.index) / amountSent)) * amountSent)
                 portion.reset_index(inplace=True, drop=True)
                 if 'index' in portion:
                     portion = portion.drop(columns=["index"])
                 
-                portion.index += offset + count - 99
+                portion.index += offset + count - (amountSent - 1)
                 items = json.loads(portion.to_json(orient='index'))
                 
                 response = requests.post(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe', json=items, headers={
