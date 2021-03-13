@@ -5,7 +5,6 @@ import requests
 import math
 from .auth import Auth
 from sys import getsizeof
-import math
 
 class _DataFrame:
     app_id = None
@@ -70,7 +69,7 @@ class _DataFrame:
         limit = 5000000 * 0.95 / 8
 
         averageSize = getsizeof(dataframe.to_json(orient="index")) / len(dataframe.index)
-        amountSent = amountSent if ((limit / averageSize) > amountToSent) else int(math.floor(limit / averageSize))
+        amountSent = amountToSent if ((limit / averageSize) > amountToSent) else int(math.floor(limit / averageSize))
 
         offset = response.json()["data"]["items"]
         count = 0
