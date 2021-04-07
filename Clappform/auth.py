@@ -27,5 +27,5 @@ class Auth:
             'password': __PASSWORD__
         })
         
-        settings.token = response.json()["data"]["token"]
+        settings.token = response.json()["data"]["access_token"]
 
