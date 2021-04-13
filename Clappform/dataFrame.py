@@ -287,7 +287,7 @@ class _DataFrame:
                 portion.reset_index(inplace=True, drop=True)
                 if 'index' in portion:
                      portion = portion.drop(columns=["index"])
-                portion.index += offset + count - (amountSent - 1)
+                portion.index += offset + count + (amountSent + 1)
                 items = json.loads(portion.to_json(orient='index'))
                 
                 response = requests.post(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe', json=items, headers={
