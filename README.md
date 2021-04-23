@@ -174,10 +174,10 @@ Clappform.App("test_app").Collection("test_collection").Item("test_item").Delete
 
 ## DataFrame
 ### Read
-The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
+The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured. The parameter 'n_jobs' is the amount of threads that will be used.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").DataFrame().Read(Original=True)
+Clappform.App("test_app").Collection("test_collection").DataFrame().Read(Original=True, n_jobs = 1)
 ```
 
 ### Synchronize
@@ -188,10 +188,22 @@ Clappform.App("test_app").Collection("test_collection").DataFrame().Synchronize(
 ```
 
 ### Append
-The Append() function returns True if all the data has been added to the collection successfully. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. The collection will **only** add the data from the dataframe. The maximum json size to be send is **5MB**, use the Append() method as an alternative. The only parameter is: 'dataframe' and is required to have a pandas dataframe.
+The Append() function returns True if all the data has been added to the collection successfully. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. The collection will **only** add the data from the dataframe. The maximum json size to be send is **5MB**, use the Append() method as an alternative. The only parameter is: 'dataframe' and is required to have a pandas dataframe. The 'show' parameter shows all the changes made to the columnnames. The parameter 'n_jobs' is the amount of threads that will be used.
+The dataframe will be altered to make the data more uniform for Clappform, the steps in which it gets altered is:
+    <br/> 1. All columnnames will be lowercased
+    <br/> 2. multiple spaced will be replaced with a single space for every columnname
+    <br/> 3. All '-' and spaces will be replaced with '_' in the columnnames
+    <br/> 4. All columnnames will be striped
+    <br/> 5. In every columnname characters which are not valid as variable names in Javascript will be removed
+    <br/> 6. Every cell will be striped unless it is a List
+    <br/> 7. All columnnames will be striped
+    <br/> 8. All columnnames which start with a number will lose its first character until it starts with an '_', '$' or letter
+<br/><br/>
+If the columnname is empty because it doesnt 
+
 
 ```python
-Clappform.App("test_app").Collection("test_collection").DataFrame().Append(dataframe=df)
+Clappform.App("test_app").Collection("test_collection").DataFrame().Append(dataframe=df, n_jobs = 1, show = False)
 ```
 
 ### Query
