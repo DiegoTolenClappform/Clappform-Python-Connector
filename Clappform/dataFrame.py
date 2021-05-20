@@ -156,20 +156,27 @@ class _DataFrame:
                 dup_columns = list(set(dup_columns))
                 return 'There are multiple column(s) %s' % dup_columns
 
-            months = 'january|february|march|april|may|june|july|august|september|october|november|december'
+            monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
             shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
 
+            day = r'((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}'
+            month = r'((1[0-2]){1}|(0?[1-9]){1}){1}'
+            year = r'([12]{1}[0-9]{3}){1}'
+            hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
+
             date_dict = {
-                '((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}/{1}((1[0-2]){1}|(0?[1-9]){1}){1}/{1}([12]{1}[0-9]{3}){1}': '%d/%m/%Y',
-                '((1[0-2]|0?[1-9])/(3[01]|[12][0-9]|0?[1-9])/([12][0-9]{3}))': '%m/%d/%Y',
-                '(([12][0-9]{3})/(1[0-2]|0?[1-9])/(3[01]|[12][0-9]|0[1-9]))': '%Y/%m/%d',
+                r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+                r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+                r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
+                r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
+                r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
                 '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
                 '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
                 '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
-                '(' + months + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
-                '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + months + ')': '%Y, %d %B',
-                '([12][0-9]{3}, (' + months + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
-                }
+                '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
+                '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
+                '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
+            }
 
             strings = []
             numbers = []
@@ -319,6 +326,14 @@ class _DataFrame:
         dataframe.columns = dataframe.columns.str.replace('-', '_')
         # Removes all spaces at the start and end
         dataframe.columns = dataframe.columns.str.strip()
+
+        exceptions = {'ü': 'u', 'ä': 'a', 'ö': 'o', 'ë': 'e', 'ï': 'i', '%': '_procent_', '&': '_and_', ' ': '_', '-': '_'}
+
+        for v, k in exceptions.items():
+            dataframe.columns = dataframe.columns.str.replace(v, k)
+
+        dataframe.columns = dataframe.columns.str.replace('__', '_')
+
         # removes all the values that Javascript doesnt allow
         dataframe.columns = dataframe.columns.str.replace('[^0-9_$a-z]', '', regex=True)
 
@@ -345,19 +360,27 @@ class _DataFrame:
             dup_columns = list(set(dup_columns))
             return 'There are multiple column(s) %s' % dup_columns
 
-        months = 'january|february|march|april|may|june|july|august|september|october|november|december'
+        monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
         shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
 
-        date_dict = {'((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}/{1}((1[0-2]){1}|(0?[1-9]){1}){1}/{1}([12]{1}[0-9]{3}){1}': '%d/%m/%Y',
-                     '((1[0-2]|0?[1-9])/(3[01]|[12][0-9]|0?[1-9])/([12][0-9]{3}))': '%m/%d/%Y',
-                     '(([12][0-9]{3})/(1[0-2]|0?[1-9])/(3[01]|[12][0-9]|0[1-9]))': '%Y/%m/%d',
-                     '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
-                     '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
-                     '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
-                     '(' + months + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
-                     '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + months + ')': '%Y, %d %B',
-                     '([12][0-9]{3}, (' + months + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
-                     }
+        day = r'((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}'
+        month = r'((1[0-2]){1}|(0?[1-9]){1}){1}'
+        year = r'([12]{1}[0-9]{3}){1}'
+        hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
+
+        date_dict = {
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+            r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
+            r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
+            r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
+            '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
+            '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
+            '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
+            '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
+            '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
+            '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
+        }
 
         strings = []
         numbers = []
@@ -468,7 +491,59 @@ class _DataFrame:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
+        monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
+        shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
+
+        day = r'((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}'
+        month = r'((1[0-2]){1}|(0?[1-9]){1}){1}'
+        year = r'([12]{1}[0-9]{3}){1}'
+        hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
+
+        date_dict = {
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+            r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
+            r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
+            r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
+            '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
+            '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
+            '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
+            '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
+            '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
+            '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
+        }
+
+        r = r"(" + ")|(".join(date_dict) + ")"
         data = []
+
+        if filters:
+            temp_date_list = []
+            temp_unix_list = []
+
+            # convert to string
+            filters = json.dumps(filters)
+            print(filters)
+            for k, v in date_dict.items():
+                temp_date = re.findall(k, filters)
+                for i in temp_date:
+                    for dates in i:
+                        if re.match(k, dates, flags=re.IGNORECASE):
+                            temp_unix_list.append(time.mktime(datetime.strptime(dates, v).timetuple()))
+                            temp_date_list.append(dates)
+
+            print(temp_date_list)
+            print(temp_unix_list)
+
+            for index, (first, second) in enumerate(zip(temp_date_list, temp_unix_list)):
+                filters = filters.replace("\"" + first + "\"", str(second))
+
+            # dataframe[i] = dataframe[i].apply(
+            #     lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
+            #         re.match(k, x, flags=re.IGNORECASE)) else x)
+
+            # load to dict
+            filters = json.loads(filters)
+            print(filters)
 
         currentLoop = 0
         maxLoops = 1
