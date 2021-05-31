@@ -319,7 +319,7 @@ class _DataFrame:
             pass
 
         # removes all dubble spaces in column name
-        dataframe.columns = dataframe.columns.str.replace('\s+s+', ' ', regex=True)
+        dataframe.columns = dataframe.columns.str.replace('\s+', ' ', regex=True)
         # Replaces all spaces with underscores
         dataframe.columns = dataframe.columns.str.replace(' ', '_')
         # Replaces all 'streepjes' with underscores
@@ -332,20 +332,24 @@ class _DataFrame:
         for v, k in exceptions.items():
             dataframe.columns = dataframe.columns.str.replace(v, k)
 
-        dataframe.columns = dataframe.columns.str.replace('__', '_')
-
         # removes all the values that Javascript doesnt allow
         dataframe.columns = dataframe.columns.str.replace('[^0-9_$a-z]', '', regex=True)
+
+        dataframe.columns = dataframe.columns.str.replace('_+', '_')
 
         # trimms all values
         dataframe = dataframe.applymap(lambda x: x.strip() if type(x) == str else x)
         dataframe = dataframe.applymap(lambda x: ' '.join(x.split()) if type(x) == str else x)
 
+
         for i in dataframe:
             l = i
             try:
-                while re.match('[^_$a-z]', i[0]):
+                while re.match('[^$a-z]', i[0]):
                     i = i[1:]
+
+                while re.match('_', i[-1]):
+                    i = i[:-1]
                 dataframe.rename(columns={l: i}, inplace=True)
 
             except IndexError as error:
@@ -429,29 +433,16 @@ class _DataFrame:
         if 'index' in dataframe:
             dataframe = dataframe.drop(columns=["index"])
 
-        def Worker(amountSent, offset, dataframe, count, x):
+        def Worker(amountSent, offset, dataframe, x):
             if not Auth.tokenValid():
                 Auth.refreshToken()
-            if (count + 1) % amountSent is 0:
-                portion = dataframe.iloc[x - (amountSent - 1) - offset:x + 1 - offset]
-                portion.reset_index(inplace=True, drop=True)
-                if 'index' in portion:
-                    portion = portion.drop(columns=["index"])
-                portion.index += offset + count + (amountSent + 1)
-                items = json.loads(portion.to_json(orient='index'))
 
-                response = requests.post(
-                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
-                    json=items, headers={
-                        'Authorization': 'Bearer ' + settings.token
-                    })
-            elif len(dataframe.index) + offset == x + 1:
-                portion = dataframe.tail(
-                    len(dataframe.index) - int(math.floor(len(dataframe.index) / amountSent)) * amountSent)
+            if x + amountSent < len(dataframe.index):
+                portion = dataframe.iloc[x:x + amountSent]
                 portion.reset_index(inplace=True, drop=True)
                 if 'index' in portion:
                     portion = portion.drop(columns=["index"])
-                portion.index += offset + count + (amountSent + 1)
+                portion.index += offset - 99
                 items = json.loads(portion.to_json(orient='index'))
                 response = requests.post(
                     settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
@@ -459,8 +450,18 @@ class _DataFrame:
                         'Authorization': 'Bearer ' + settings.token
                     })
 
-            count += 1
-
+            elif x + amountSent >= len(dataframe.index):
+                portion = dataframe.iloc[x:len(dataframe.index)]
+                portion.reset_index(inplace=True, drop=True)
+                if 'index' in portion:
+                    portion = portion.drop(columns=["index"])
+                portion.index += offset - 99
+                items = json.loads(portion.to_json(orient='index'))
+                response = requests.post(
+                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
+                    json=items, headers={
+                        'Authorization': 'Bearer ' + settings.token
+                    })
 
         amountToSent = 100
         limit = 5000000 * 0.95 / 8
@@ -469,11 +470,11 @@ class _DataFrame:
         amountSent = amountToSent if ((limit / averageSize) > amountToSent) else int(math.floor(limit / averageSize))
 
         offset = response.json()["data"]["items"]
-        count = 0
         threadlist = []
 
-        for x in range(0 + offset, len(dataframe.index) + offset):
-            threadlist.append(Thread(target=Worker, args=(amountSent, offset, dataframe, count, x)))
+        for x in range(0, len(dataframe.index), amountSent):
+            offset = offset + amountSent
+            threadlist.append(Thread(target=Worker, args=(amountSent, offset, dataframe, x)))
             if x % n_jobs == 0:
                 for thread in threadlist:
                     thread.start()
