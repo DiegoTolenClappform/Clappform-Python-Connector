@@ -166,7 +166,9 @@ class _DataFrame:
 
             date_dict = {
                 r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-                r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+                r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%d-%m %H:%M:%S',
+                r'\b(' + day + '-{1}' + month + '-{1}' + year + ' ' + hms + r')\b': '%d-%m-%Y %H:%M:%S',
+                r'\b(' + month + '-{1}' + day + '-{1}' + year + ' ' + hms + r')\b': '%m-%d-%Y %H:%M:%S',
                 r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
                 r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
                 r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
@@ -374,7 +376,9 @@ class _DataFrame:
 
         date_dict = {
             r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%d-%m %H:%M:%S',
+            r'\b(' + day + '-{1}' + month + '-{1}' + year + ' ' + hms + r')\b': '%d-%m-%Y %H:%M:%S',
+            r'\b(' + month + '-{1}' + day + '-{1}' + year + ' ' + hms + r')\b': '%m-%d-%Y %H:%M:%S',
             r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
             r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
             r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
@@ -420,10 +424,7 @@ class _DataFrame:
                     lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
                         re.match(k, x, flags=re.IGNORECASE)) else x)
 
-        if show == True:
-            for index, (first, second) in enumerate(zip(df.columns, dataframe.columns)):
-                if first != second:
-                    print(first, 'has been changed to', second)
+
 
         dataframe.reset_index(inplace=True, drop=True)
         response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id, headers={
@@ -502,7 +503,9 @@ class _DataFrame:
 
         date_dict = {
             r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%d-%m %H:%M:%S',
+            r'\b(' + day + '-{1}' + month + '-{1}' + year + ' ' + hms + r')\b': '%d-%m-%Y %H:%M:%S',
+            r'\b(' + month + '-{1}' + day + '-{1}' + year + ' ' + hms + r')\b': '%m-%d-%Y %H:%M:%S',
             r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
             r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
             r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
