@@ -165,6 +165,10 @@ class _DataFrame:
             hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
 
             date_dict = {
+                r'\b(' + year + '-{1}' + month + '-{1}' + day + 'T' + hms + r'.000000000)\b': '%Y-%m-%dT%H:%M:%S',
+                r'\b(' + year + '-{1}' + day + '-{1}' + month + 'T' + hms + r'.000000000)\b': '%Y-%d-%mT%H:%M:%S',
+                r'\b(' + day + '-{1}' + month + '-{1}' + year + 'T' + hms + r'.000000000)\b': '%d-%m-%YT%H:%M:%S',
+                r'\b(' + month + '-{1}' + day + '-{1}' + year + 'T' + hms + r'.000000000)\b': '%m-%d-%YT%H:%M:%S',
                 r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
                 r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%d-%m %H:%M:%S',
                 r'\b(' + day + '-{1}' + month + '-{1}' + year + ' ' + hms + r')\b': '%d-%m-%Y %H:%M:%S',
@@ -172,9 +176,14 @@ class _DataFrame:
                 r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
                 r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
                 r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
+                r'\b(' + year + '/{1}' + day + '/{1}' + month + r')\b': '%Y/%d/%m',
+                r'\b(' + year + '-{1}' + month + '-{1}' + day + r')\b': '%Y-%m-%d',
+                r'\b(' + year + '-{1}' + day + '-{1}' + month + r')\b': '%Y-%d-%m',
+                r'\b(' + day + '-{1}' + month + '-{1}' + year + r')\b': '%d-%m-%Y',
+                r'\b(' + month + '-{1}' + day + '-{1}' + year + r')\b': '%m-%d-%Y',
                 '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
                 '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
-                '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
+                r'\b(' + year + '-{1}' + month + '-{1}' + day + r')\b': '%Y-%m-%d',
                 '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
                 '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
                 '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
@@ -375,6 +384,10 @@ class _DataFrame:
         hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
 
         date_dict = {
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + 'T' + hms + r'.000000000)\b': '%Y-%m-%dT%H:%M:%S',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + 'T' + hms + r'.000000000)\b': '%Y-%d-%mT%H:%M:%S',
+            r'\b(' + day + '-{1}' + month + '-{1}' + year + 'T' + hms + r'.000000000)\b': '%d-%m-%YT%H:%M:%S',
+            r'\b(' + month + '-{1}' + day + '-{1}' + year + 'T' + hms + r'.000000000)\b': '%m-%d-%YT%H:%M:%S',
             r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
             r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%d-%m %H:%M:%S',
             r'\b(' + day + '-{1}' + month + '-{1}' + year + ' ' + hms + r')\b': '%d-%m-%Y %H:%M:%S',
@@ -382,9 +395,14 @@ class _DataFrame:
             r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
             r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
             r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
+            r'\b(' + year + '/{1}' + day + '/{1}' + month + r')\b': '%Y/%d/%m',
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + r')\b': '%Y-%m-%d',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + r')\b': '%Y-%d-%m',
+            r'\b(' + day + '-{1}' + month + '-{1}' + year + r')\b': '%d-%m-%Y',
+            r'\b(' + month + '-{1}' + day + '-{1}' + year + r')\b': '%m-%d-%Y',
             '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
             '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
-            '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + r')\b': '%Y-%m-%d',
             '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
             '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
             '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
@@ -502,6 +520,10 @@ class _DataFrame:
         hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
 
         date_dict = {
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + 'T' + hms + r'.000000000)\b': '%Y-%m-%dT%H:%M:%S',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + 'T' + hms + r'.000000000)\b': '%Y-%d-%mT%H:%M:%S',
+            r'\b(' + day + '-{1}' + month + '-{1}' + year + 'T' + hms + r'.000000000)\b': '%d-%m-%YT%H:%M:%S',
+            r'\b(' + month + '-{1}' + day + '-{1}' + year + 'T' + hms + r'.000000000)\b': '%m-%d-%YT%H:%M:%S',
             r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
             r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%d-%m %H:%M:%S',
             r'\b(' + day + '-{1}' + month + '-{1}' + year + ' ' + hms + r')\b': '%d-%m-%Y %H:%M:%S',
@@ -509,9 +531,14 @@ class _DataFrame:
             r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
             r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
             r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
+            r'\b(' + year + '/{1}' + day + '/{1}' + month + r')\b': '%Y/%d/%m',
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + r')\b': '%Y-%m-%d',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + r')\b': '%Y-%d-%m',
+            r'\b(' + day + '-{1}' + month + '-{1}' + year + r')\b': '%d-%m-%Y',
+            r'\b(' + month + '-{1}' + day + '-{1}' + year + r')\b': '%m-%d-%Y',
             '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
             '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
-            '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
+            r'\b(' + year + '-{1}' + month + '-{1}' + day + r')\b': '%Y-%m-%d',
             '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
             '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
             '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
@@ -526,7 +553,6 @@ class _DataFrame:
 
             # convert to string
             filters = json.dumps(filters)
-            print(filters)
             for k, v in date_dict.items():
                 temp_date = re.findall(k, filters)
                 for i in temp_date:
@@ -535,19 +561,11 @@ class _DataFrame:
                             temp_unix_list.append(time.mktime(datetime.strptime(dates, v).timetuple()))
                             temp_date_list.append(dates)
 
-            print(temp_date_list)
-            print(temp_unix_list)
-
             for index, (first, second) in enumerate(zip(temp_date_list, temp_unix_list)):
                 filters = filters.replace("\"" + first + "\"", str(second))
 
-            # dataframe[i] = dataframe[i].apply(
-            #     lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
-            #         re.match(k, x, flags=re.IGNORECASE)) else x)
-
             # load to dict
             filters = json.loads(filters)
-            print(filters)
 
         currentLoop = 0
         maxLoops = 1
