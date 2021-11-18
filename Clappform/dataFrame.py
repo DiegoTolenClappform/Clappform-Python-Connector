@@ -265,6 +265,7 @@ class _DataFrame:
 
             offset = response.json()["data"]["items"]
             count = 0
+            threadlist = []
             for x in range(0 + offset, len(dataframe.index) + offset):
                 threadlist.append(Thread(target=Worker, args=(self, amountSent, offset, dataframe, count)))
                 if i % n_jobs == 0:
