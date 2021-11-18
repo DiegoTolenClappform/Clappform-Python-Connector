@@ -83,7 +83,7 @@ class _DataFrame:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '/dataframe',
+        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
                                    headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] == 200:
