@@ -585,7 +585,7 @@ class _DataFrame:
                     
             itemIDString = json.dump(x)
 
-            response = requests.delete(settings.baseURL + "api/item/defualt/asd/dataframe",
+            response = requests.delete(settings.baseURL + "api/item/" + self.app_id + "/" + self.collection_id +"/dataframe",
                         json={
                             "content": itemIDString
                         },
