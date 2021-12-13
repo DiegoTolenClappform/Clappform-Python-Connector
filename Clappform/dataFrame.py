@@ -1,3 +1,4 @@
+from requests.models import Response
 from .settings import settings
 import pandas as pd
 import numpy as np
@@ -571,3 +572,27 @@ class _DataFrame:
             currentLoop += 1
 
         return pd.DataFrame(data)
+
+    def DeleteItems(self, ItemIDArray=[]):
+        if not Auth.tokenValid():
+            Auth.refreshToken()
+        
+        if len(ItemIDArray) > 0:
+
+            x = {
+                "data": ItemIDArray
+            }        
+                    
+            itemIDString = json.dump(x)
+
+            response = requests.delete(settings.baseURL + "api/item/defualt/asd/dataframe",
+                        json={
+                            "content": itemIDString
+                        },
+                        headers={
+                            'Authorization': 'Bearer ' + settings.token
+                        })
+        else:
+            raise Exception('No IDs to delete')
+
+        return response
