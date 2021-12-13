@@ -583,7 +583,7 @@ class _DataFrame:
                 "data": ItemIDArray
             }        
                     
-            itemIDString = json.dump(x)
+            itemIDString = json.dumps(x)
 
             response = requests.delete(settings.baseURL + "api/item/" + self.app_id + "/" + self.collection_id +"/dataframe",
                         json={
