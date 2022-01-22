@@ -188,7 +188,7 @@ class _Collection:
                 maxLoops = math.ceil(response.json()["total"] / 500)
 
                 for item in response.json()["data"]:
-                    data.append(item["data"])
+                    data.append(item)
 
             currentLoop += 1
 

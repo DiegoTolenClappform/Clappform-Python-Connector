@@ -80,7 +80,7 @@ class _DataFrame:
 
         return pd.DataFrame(self.data)
 
-    def Synchronize(self, dataframe):
+    def Synchronize(self, dataframe, n_jobs=1):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
