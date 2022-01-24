@@ -188,7 +188,10 @@ class _Collection:
                 maxLoops = math.ceil(response.json()["total"] / 500)
 
                 for item in response.json()["data"]:
-                    data.append(item)
+                    if projection:
+                        data.append(item)
+                    else:
+                        data.append(item["data"])
 
             currentLoop += 1
 
