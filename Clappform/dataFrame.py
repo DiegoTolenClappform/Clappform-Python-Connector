@@ -22,7 +22,7 @@ class _DataFrame:
         self.app_id = app
         self.collection_id = collection
 
-    def Read(self, original=True, itemsPerRun=500, n_jobs = 1):
+    def Read(self, original=True, itemsPerRun=100, n_jobs = 1):
 
         self.data = []
         if not Auth.tokenValid():
