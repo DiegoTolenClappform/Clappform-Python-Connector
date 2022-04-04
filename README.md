@@ -24,7 +24,7 @@ All authentication is handled by the Auth class. The Auth class is exposed throu
 Clappform.Auth(baseURL="https://dev.clappform.com/", username="test@clappform.com", password="test")
 ```
 
-**NOTE:** *It's strongly recommended to create per environment a seperate user for the importing scripts* 
+**NOTE:** *It's strongly recommended to create per environment a seperate user for the importing scripts*
 
 # Exposed Classes
 In this section all the available functions of the module will be described.
@@ -199,7 +199,7 @@ The dataframe will be altered to make the data more uniform for Clappform, the s
     <br/> 7. All columnnames will be striped
     <br/> 8. All columnnames which start with a number will lose its first character until it starts with an '_', '$' or letter
 <br/><br/>
-If the columnname is empty because it doesnt 
+If the columnname is empty because it doesnt
 
 
 ```python
@@ -236,7 +236,7 @@ Clappform.Notification.Create(user='test@clappform.com', content='Data has been 
 ```
 
 ### Update
-The Update() function returns an instance of the Notification class containing the correct id if the notification has been updated, otherwise it will raise an exception. For instance an exception will be thrown if the value types are wrong. Optional parameters are: is_opened (Boolean). 
+The Update() function returns an instance of the Notification class containing the correct id if the notification has been updated, otherwise it will raise an exception. For instance an exception will be thrown if the value types are wrong. Optional parameters are: is_opened (Boolean).
 
 ```python
 Clappform.Notification(1).Update(is_opened=True)
@@ -267,8 +267,10 @@ Clappform.Email(1).ReadOne()
 ### Create
 The Create() function returns an instance of the Email class containing the correct id if the email has been sent, otherwise it will raise an exception. For instance an exception will be thrown if the user couldn't be found. The required parameters are: user, subject and content.
 
+Currently for internal testing and use only
+
 ```python
-Clappform.Email.Create(user='test@clappform.com', subject='Data Updated', content='Dear ..., The data has been updated.')
+Clappform.Email.Create(recipientmail='test@clappform.com', recipientname='Tester test', mailsubject='Data Updated', content='Dear ..., The data has been updated.')
 ```
 
 ## SMS
@@ -318,3 +320,12 @@ Clappform.Whatsapp.Create(user='test@clappform.com', content='Data has been upda
 
 ## Settings
 The settings class is used as module-wide storage for the module. It holds the current token and the base URL.
+
+## User
+
+### Create
+The create function allows you to create a public user when using the authkey. This function is made for internal use only and added to the readme for documentation.
+
+```python
+Clappform.User.Create(clappformuri='https://www.clappform-test.com/', authpassword='secret', email='newusermail@mail.com', firstname="firstname", lastname='lastname', phone='+31600000000', password='another secret')
+```
