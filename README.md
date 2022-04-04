@@ -270,7 +270,7 @@ The Create() function returns an instance of the Email class containing the corr
 Currently for internal testing and use only
 
 ```python
-Clappform.Email.Create(recipientmail='test@clappform.com', recipientname='Tester test', mailsubject='Data Updated', content='Dear ..., The data has been updated.')
+Clappform.Email.Create(templatejson={}, tojson={}, fromjson={}, template_id="id string")
 ```
 
 ## SMS
