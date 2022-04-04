@@ -14,9 +14,9 @@ class User:
             'password': authpassword
         })
 
-        if response.json()["code"] is not 200:
+        if rep.json()["code"] is not 200:
             raise Exception(response.json()["message"])
-                    
+
         token = rep.json()["data"]["access_token"]
 
         response = requests.post(clappformuri + 'api/user', json={
