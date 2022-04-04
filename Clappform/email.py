@@ -2,6 +2,7 @@ from .settings import settings
 from .auth import Auth
 import requests
 import os
+import json
 
 class Email:
     id = None
