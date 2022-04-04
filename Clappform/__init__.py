@@ -5,6 +5,6 @@ from .notification import Notification
 from .whatsapp import Whatsapp
 from .sms import SMS
 from .email import Email
-from .user import user
+from .user import User
 
 settings
