@@ -53,8 +53,8 @@ class Email:
         
         rep = requests.post('https://api.sendgrid.com/v3/mail/send', json=data, headers={'Authorization': 'Bearer ' + os.getenv("SENDGRID_API_KEY")})
 
-        if response.json()["code"] is 202:
+        if rep.json()["code"] is 202:
             return "email has been send."
         else:
-            raise Exception(response.json()["message"])
+            raise Exception(rep.json()["message"])
 
