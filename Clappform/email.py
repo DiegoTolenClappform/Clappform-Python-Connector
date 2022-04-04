@@ -53,5 +53,5 @@ class Email:
 
         rep = requests.post('https://api.sendgrid.com/v3/mail/send', json=data, headers={'Authorization': 'Bearer ' + os.getenv("SENDGRID_API_KEY")})
 
-        return rep
+        return rep.json()
 
