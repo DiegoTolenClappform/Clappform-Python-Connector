@@ -41,20 +41,17 @@ class Email:
     def Create(templateid, tojson, templatejson, fromjson):
         if not Auth.tokenValid():
             Auth.refreshToken()
-            
-        data = { 
+
+        data = {
             "template_id" : templateid,
-            "personalizations": [{ 
+            "personalizations": [{
                 "to": [tojson],
                 "dynamic_template_data": templatejson
             }],
             "from": fromjson
-        }            
-        
+        }
+
         rep = requests.post('https://api.sendgrid.com/v3/mail/send', json=data, headers={'Authorization': 'Bearer ' + os.getenv("SENDGRID_API_KEY")})
 
-        if rep.json()["code"] is 202:
-            return "email has been send."
-        else:
-            raise Exception(rep.json()["message"])
+        return rep
 
