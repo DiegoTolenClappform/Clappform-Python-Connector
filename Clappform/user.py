@@ -2,18 +2,21 @@ from .settings import settings
 from .auth import Auth
 import requests
 
-class user:
+class User:
     id = None
 
     def __init__(self, user = None):
         self.id = user
 
-    def create(clappformuri, authpassword, email, firstname, lastname, phone, password):
+    def Create(clappformuri, authpassword, email, firstname, lastname, phone, password):
         rep = requests.post(clappformuri + 'api/user/auth', json={
             'username': "public@clappform-system.com",
             'password': authpassword
         })
 
+        if response.json()["code"] is not 200:
+            raise Exception(response.json()["message"])
+                    
         token = rep.json()["data"]["access_token"]
 
         response = requests.post(clappformuri + 'api/user', json={
