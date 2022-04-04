@@ -26,7 +26,7 @@ setup(
     license="MIT",
     packages = ['Clappform'],
     install_requires=[
-        "pandas",
+        "pandas"
     ],
     include_package_data=True,
 )
