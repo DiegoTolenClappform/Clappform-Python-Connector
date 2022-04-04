@@ -27,7 +27,6 @@ setup(
     packages = ['Clappform'],
     install_requires=[
         "pandas",
-        "sendgrid"
     ],
     include_package_data=True,
 )
