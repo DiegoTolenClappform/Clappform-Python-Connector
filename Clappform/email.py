@@ -1,10 +1,7 @@
 from .settings import settings
 from .auth import Auth
 import requests
-
 import os
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import *
 
 class Email:
     id = None
@@ -41,32 +38,23 @@ class Email:
             raise Exception(response.json()["message"])
 
 
-    def Create(recipientmail, recipientname, mailsubject, content):
+    def Create(templateid, tojson, templatejson, fromjson):
         if not Auth.tokenValid():
             Auth.refreshToken()
+            
+        data = { 
+            "template_id" : templateid,
+            "personalizations": [{ 
+                "to": [tojson],
+                "dynamic_template_data": templatejson
+            }],
+            "from": fromjson
+        }            
+        
+        rep = requests.post('https://api.sendgrid.com/v3/mail/send', json=data, headers={'Authorization': 'Bearer ' + os.getenv("SENDGRID_API_KEY")})
 
-        message = Mail()
-
-        message.to = [
-            To(
-                email = recipientmail,
-                name = recipientname,
-            ),
-        ]
-        message.from_email = From(
-            email="info@clappform.com",
-            name="Clappform",
-        )
-        message.subject = mailsubject
-
-        message.content = [
-            Content(
-                mime_type="text/html",
-                content=content
-            )
-        ]
-
-        SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
-
-
+        if response.json()["code"] is 202:
+            return "email has been send."
+        else:
+            raise Exception(response.json()["message"])
 
