@@ -15,7 +15,7 @@ class User:
         })
 
         if rep.json()["code"] is not 200:
-            raise Exception(response.json()["message"])
+            raise Exception(rep.json()["message"])
 
         token = rep.json()["data"]["access_token"]
 
