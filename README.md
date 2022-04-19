@@ -267,10 +267,9 @@ Clappform.Email(1).ReadOne()
 ### Create
 The Create() function returns an instance of the Email class containing the correct id if the email has been sent, otherwise it will raise an exception. For instance an exception will be thrown if the user couldn't be found. The required parameters are: user, subject and content.
 
-Currently for internal testing and use only
+#### Note Currently for internal use only.
 
 ```python
-Create(templateid, tojson, templatejson, fromjson):
 Clappform.Email.Create( template_id="id string", tojson={}, templatejson={}, fromjson={})
 ```
 
@@ -327,6 +326,9 @@ The settings class is used as module-wide storage for the module. It holds the c
 ### Create
 The create function allows you to create a public user when using the authkey. This function is made for internal use only and added to the readme for documentation.
 
+#### Note Currently for internal use only.
+only has been added to the readme for documentation.
+
 ```python
-Clappform.User.Create(clappformuri='https://www.clappform-test.com/', authpassword='secret', email='newusermail@mail.com', firstname="firstname", lastname='lastname', phone='+31600000000', password='another secret')
+Clappform.User.Create(clappformuri='https://www.example.com/', authpassword='secret', email='newusermail@mail.com', firstname="firstname", lastname='lastname', phone='+31600000000', password='another secret')
 ```
