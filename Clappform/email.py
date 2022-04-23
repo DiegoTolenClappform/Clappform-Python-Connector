@@ -56,4 +56,6 @@ class Email:
 
         if rep.status_code is 202:
             return "Mail is send"
+        else:
+            return rep.json()
 

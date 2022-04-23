@@ -31,6 +31,6 @@ class User:
             })
 
         if response.json()["code"] is 200:
-            return "user created"
+            return response.json()
         else:
-            raise Exception(response.json()["message"])
+            return response.json()["message"])
