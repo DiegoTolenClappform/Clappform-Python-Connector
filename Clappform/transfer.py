@@ -6,11 +6,11 @@ from github import Github
 import time
 
 
-class Model:
+class Transfer:
     id = None
 
-    def __init__(self, model = None):
-        self.id = model
+    def __init__(self, transfer = None):
+        self.id = transfer
 
     def Create_App(app, version):
         if not Auth.tokenValid():
