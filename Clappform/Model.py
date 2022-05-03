@@ -116,7 +116,7 @@ class Model:
 
         return response.json()
 
-    def GenerateApp(gitAccessToken, app, version):
+    def GenerateApp(self, gitAccessToken, app, version):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
