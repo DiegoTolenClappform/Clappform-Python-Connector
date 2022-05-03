@@ -9,7 +9,7 @@ import time
 class Model:
     id = None
 
-    def _init_(self, model = None):
+    def __init__(self, model = None):
         self.id = model
 
     def Create_App(app, version):
