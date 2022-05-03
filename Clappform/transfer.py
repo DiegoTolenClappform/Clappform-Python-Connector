@@ -117,7 +117,7 @@ class Transfer:
 
         return response.json()
 
-    def GenerateApp(self, gitAccessToken, app, version):
+    def GenerateApp(gitAccessToken, app, version):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
