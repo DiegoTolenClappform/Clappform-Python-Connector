@@ -33,4 +33,4 @@ class User:
         if response.json()["code"] is 200:
             return response.json()
         else:
-            return response.json()["message"])
+            return response.json()["message"]
