@@ -1,6 +1,7 @@
 from .settings import settings
 from .auth import Auth
 from .app import App
+from .model import Model
 from .notification import Notification
 from .whatsapp import Whatsapp
 from .sms import SMS
