@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="Clappform",
-    version="1.8.37",
+    version="1.8.38",
     description="Clappform API Connector",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -26,7 +26,8 @@ setup(
     license="MIT",
     packages = ['Clappform'],
     install_requires=[
-        "pandas"
+        "pandas",
+        "PyGithub"
     ],
     include_package_data=True,
 )
