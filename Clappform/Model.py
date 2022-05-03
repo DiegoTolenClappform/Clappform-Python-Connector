@@ -3,7 +3,6 @@ from .auth import Auth
 import requests
 import json
 from github import Github
-import time
 
 class Model:
     id = None
