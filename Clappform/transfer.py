@@ -121,15 +121,28 @@ class Transfer:
     def GenerateApp(gitAccessToken, app, version):
         if not Auth.tokenValid():
             Auth.refreshToken()
+        print(gitAccessToken)
+        print(app)
+        print(version)
+        print(1)
 
         # Get app and collection data
         responseApp = App(app).ReadOne(extended=True)
+        print(2)
+
         collectionData = responseApp["collections"]
+        print(3)
+
         collectionData = json.dumps(collectionData)
+        print(4)
+
         appData = json.dumps(responseApp)
+        print(5)
 
         # Get current version of api, web_application and web_server
         responseVersion = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
+        print(6)
+
         versionData = responseVersion.json()["data"]
         print(versionData)
         g = Github(gitAccessToken)
