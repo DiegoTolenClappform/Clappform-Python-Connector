@@ -143,7 +143,7 @@ class Transfer:
         commitMessage = "New App"
         configData = {
             "timestamp": timestamp_int,
-            "created_by": __USERNAME__,
+            "created_by": Auth.__USERNAME__,
             "enviroment": settings.baseURL,
             "api_version": versionData["api"],
             "web_application_version": versionData["web_application"],
