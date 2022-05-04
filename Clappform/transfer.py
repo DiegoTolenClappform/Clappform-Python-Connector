@@ -1,5 +1,6 @@
 from .settings import settings
 from .auth import Auth
+from .app import App
 import requests
 import json
 from github import Github
@@ -122,8 +123,7 @@ class Transfer:
             Auth.refreshToken()
 
         # Get app and collection data
-        appData = requests.get(settings.baseURL + 'api/app/' + app + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
-        collectionData = appData.json()["data"]
+        appData = App(app).ReadOne(extended=True)
         collectionData = appData["collections"]
         collectionData = json.dumps(collectionData)
         appData = json.dumps(appData)
