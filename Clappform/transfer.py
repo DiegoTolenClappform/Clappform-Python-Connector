@@ -128,10 +128,10 @@ class Transfer:
         collectionData = json.dumps(collectionData)
         appData = json.dumps(responseApp)
 
-        # Get current version of api used
+        # Get current version of api, web_application and web_server
         responseVersion = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
         versionData = responseVersion.json()["data"]
-
+        print(versionData)
         g = Github(gitAccessToken)
         repo = g.get_repo("bharkema/Clappform_models")
         branch = repo.get_branch(branch="main")
@@ -145,9 +145,9 @@ class Transfer:
             "timestamp": timestamp_int,
             "created_by": __USERNAME__,
             "enviroment": settings.baseURL,
-            "api_version": versionData["data"]["api"],
-            "web_application_version": versionData["data"]["web_application"],
-            "web_server_version": versionData["data"]["web_server"],
+            "api_version": versionData["api"],
+            "web_application_version": versionData["web_application"],
+            "web_server_version": versionData["web_server"],
             "deployable": "true"
         }
         appFilePath = "Apps/" + app + "/" + version +"/ "+ timestamp + "_app.json"
