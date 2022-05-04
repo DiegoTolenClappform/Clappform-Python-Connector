@@ -127,7 +127,9 @@ class Transfer:
         print(1)
 
         # Get app and collection data
-        responseApp = App(app).ReadOne(extended=True)
+        # responseApp = App(app).ReadOne(extended=True)
+        responseApp = requests.get(settings.baseURL + 'api/app/' + app + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+
         print(2)
 
         collectionData = responseApp["collections"]
