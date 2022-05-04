@@ -123,14 +123,14 @@ class Transfer:
             Auth.refreshToken()
 
         # Get app and collection data
-        appData = App(app).ReadOne(extended=True)
-        collectionData = appData["collections"]
+        responseApp = App(app).ReadOne(extended=True)
+        collectionData = responseApp["collections"]
         collectionData = json.dumps(collectionData)
-        appData = json.dumps(appData)
+        appData = json.dumps(responseApp)
 
         # Get current version of api used
-        versionData = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
-        versionData = versionData.json()["data"]
+        responseVersion = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
+        versionData = responseVersion.json()["data"]
 
         g = Github(gitAccessToken)
         repo = g.get_repo("bharkema/Clappform_models")
