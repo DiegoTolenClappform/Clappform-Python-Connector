@@ -11,6 +11,7 @@ class Auth:
         global __PASSWORD__
         __USERNAME__ = username
         __PASSWORD__ = password
+        settings.username = username
 
     def tokenValid():
         if '__TOKEN__' in globals():
@@ -25,6 +26,5 @@ class Auth:
             'username': __USERNAME__,
             'password': __PASSWORD__
         })
-
         settings.token = response.json()["data"]["access_token"]
 
