@@ -13,10 +13,11 @@ class Transfer:
     def __init__(self, transfer = None):
         self.id = transfer
 
-    def Create_App(app, version):
+    def CreateApp(app, version):
         if not Auth.tokenValid():
             Auth.refreshToken()
         gitUrl = "https://raw.githubusercontent.com/bharkema/clappform_models"
+
         URI = gitUrl + "/main/Apps/" + app +"/" + version + "/_config.json"
         gitresponse = requests.get(URI)
         if gitresponse.status_code != 200:
@@ -39,18 +40,19 @@ class Transfer:
             print(version_response.json())
             raise Exception('Not deployable')
 
-        version_json = version_response.json()["data"]
-        if(config_json["web_aplication_version"] != version_json["web_app"]):
-            print("NOT DEPLOYABLE")
-            raise Exception('Not deployable')
+        # Temporarily turned off
+        # version_json = version_response.json()["data"]
+        # if(config_json["web_application_version"] != version_json["web_application"]):
+        #     print("NOT DEPLOYABLE")
+        #     raise Exception('Not deployable')
 
-        if(config_json["web_server_version"] != version_json["web_serv"]):
-            print("NOT DEPLOYABLE")
-            raise Exception('Not deployable')
+        # if(config_json["web_server_version"] != version_json["web_server"]):
+        #     print("NOT DEPLOYABLE")
+        #     raise Exception('Not deployable')
 
-        if(config_json["api_version"] != version_json["api"]):
-            print("NOT DEPLOYABLE")
-            raise Exception('Not deployable')
+        # if(config_json["api_version"] != version_json["api"]):
+        #     print("NOT DEPLOYABLE")
+        #     raise Exception('Not deployable')
 
         # App is deployable. Start getting config data from Github.
         timestamp = 0
@@ -86,22 +88,22 @@ class Transfer:
 
         permission_json = git_permission_response.json()
 
-        # Check validity of json downloads by dumping if something goes wring JSON is not correct.
+        # Check validity of JSON downloads by dumping content
         try:
             test = json.dumps(app_json, separators=(',', ':'))
         #     print(test)
         except:
-            print("Not able to dump json. App data might be broken")
+            print("Not able to dump json. App data might be invalid")
         try:
             test = json.dumps(collection_json, separators=(',', ':'))
         #     print(test)
         except:
-            print("Not able to dump json. Collection data might be broken")
+            print("Not able to dump json. Collection data might be invalid")
         try:
             test = json.dumps(permission_json, separators=(',', ':'))
         #     print(test)
         except:
-            print("Not able to dump json. permission data might be broken")
+            print("Not able to dump json. Permission data might be invalid")
 
         # Send files to API for recontruction.
         url = settings.baseURL + "api/transfer/app"
@@ -110,7 +112,7 @@ class Transfer:
             "collection_json": json.dumps(collection_json, separators=(',', ':')),
             "permission_json": json.dumps(permission_json, separators=(',', ':'))
         },headers={
-                'Authorization': 'Bearer ' + settings.token
+            'Authorization': 'Bearer ' + settings.token
         })
 
         # return response so pypi user can still let his code run.
@@ -118,7 +120,7 @@ class Transfer:
 
         return response.json()
 
-    def GenerateApp(app = "", gitAccessToken = "", version = ""):
+    def PublishApp(app = "", gitAccessToken = "", version = ""):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
