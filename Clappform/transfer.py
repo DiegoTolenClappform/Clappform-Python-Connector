@@ -152,13 +152,13 @@ class Transfer:
             "web_server_version": versionData["web_server"],
             "deployable": "true"
         }
-        appFilePath = "Apps/" + app + "/" + version +"/ "+ timestamp + "_app.json"
+        appFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_app.json"
         repo.create_file(appFilePath, commitMessage, appData, branch="main")
 
-        collectionFilePath = "Apps/" + app + "/" + version +"/ "+ timestamp + "_collections.json"
+        collectionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_collections.json"
         repo.create_file(collectionFilePath, commitMessage, collectionData, branch="main")
 
-        permissionFilePath = "Apps/" + app + "/" + version +"/ "+ timestamp + "_permission.json"
+        permissionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_permission.json"
         repo.create_file(permissionFilePath, commitMessage, "[{}]", branch="main")
 
         configFilePath = "Apps/" + app + "/" + version +"/_config.json"
