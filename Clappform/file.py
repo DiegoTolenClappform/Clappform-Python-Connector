@@ -22,7 +22,7 @@ class File:
         filepath = folderpath + "/" + file_name
 
         if overwrite or not os.path.exists(filepath):
-            with open(filepath, 'wb') as fd:
+            with open(filepath, 'wb', encoding='utf-8') as fd:
                 fd.write(content)
         else:
             return "File already exists"
