@@ -8,7 +8,7 @@ class File:
     def __init__(self, file = None):
         self.id = file
 
-    def Upload(content:bytes, overwrite=False):
+    def Upload(content:bytes, file_type="", file_name="", overwrite=False):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
         WORKER_PERSISTENT_STORAGE_PATH = "/data/azure/"
@@ -22,7 +22,7 @@ class File:
         filepath = folderpath + "/" + file_name
 
         if overwrite or not os.path.exists(filepath):
-            with open(filepath, 'wb', encoding='utf-8') as fd:
+            with open(filepath, 'wb') as fd:
                 fd.write(content)
         else:
             return "File already exists"
