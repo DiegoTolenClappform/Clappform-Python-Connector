@@ -8,7 +8,7 @@ class File:
     def __init__(self, file = None):
         self.id = file
 
-    def Upload(content:bytes, file_type="", file_name="", overwrite=False):
+    def Upload(content:bytes, overwrite=False):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
         WORKER_PERSISTENT_STORAGE_PATH = "/data/azure/"
