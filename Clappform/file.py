@@ -8,10 +8,10 @@ class File:
     def __init__(self, file = None):
         self.id = file
 
-    def Upload(content:bytes, file_type="", file_name="", overwrite=False):
+    def Upload(file_type="", file_name="", overwrite=False):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
-        WORKER_PERSISTENT_STORAGE_PATH = "/data/azure/"
+        WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
 
         if not Auth.tokenValid():
             Auth.refreshToken()
@@ -22,17 +22,21 @@ class File:
         filepath = folderpath + "/" + file_name
 
         if overwrite or not os.path.exists(filepath):
-            with open(filepath, 'wb') as fd:
-                fd.write(content)
+            if file_type == "parquet":
+                content.to_parquet(filepath,compression='gzip')
+            else:
+                with open(filepath, 'wb') as fd:
+                    fd.write(bytes(content, 'utf-8'))
+                    print("File Created")
         else:
-            return "File already exists"
+            print("File already exists")
 
         return "File Created"
 
     def Read(file_type = "", file_name = "") -> bytes:
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
-        WORKER_PERSISTENT_STORAGE_PATH = "/data/azure/"
+        WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
 
         folderpath = WORKER_PERSISTENT_STORAGE_PATH + environment + "/" + file_type
         filepath = folderpath + "/" + file_name
