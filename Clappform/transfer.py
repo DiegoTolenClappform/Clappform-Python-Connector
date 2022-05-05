@@ -127,8 +127,7 @@ class Transfer:
         # Get app and collection data
         responseApp = App(app).ReadOne(extended=True)
         collectionData = responseApp["collections"]
-        collectionData = json.dumps(collectionData)
-        appData = json.dumps(responseApp)
+
 
         # Get current version of api, web_application and web_server
         responseVersion = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
@@ -153,12 +152,12 @@ class Transfer:
             "deployable": "true"
         }
         appFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_app.json"
-        repo.create_file(appFilePath, commitMessage, appData, branch="main")
+        repo.create_file(appFilePath, commitMessage, json.dumps(responseApp), branch="main")
 
         collectionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_collections.json"
-        repo.create_file(collectionFilePath, commitMessage, collectionData, branch="main")
+        repo.create_file(collectionFilePath, commitMessage, json.dumps(collectionData), branch="main")
 
-        permissionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_permission.json"
+        permissionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_permission.json" # Restore requires permission file
         repo.create_file(permissionFilePath, commitMessage, "[{}]", branch="main")
 
         configFilePath = "Apps/" + app + "/" + version +"/_config.json"
