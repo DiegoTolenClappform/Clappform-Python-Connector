@@ -1,6 +1,8 @@
 from .settings import settings
 from .auth import Auth
 import os
+import time
+import pandas as pd
 
 class File:
     id = None
@@ -27,24 +29,26 @@ class File:
             else:
                 with open(filepath, 'wb') as fd:
                     fd.write(bytes(content, 'utf-8'))
-                    print("File Created")
         else:
-            print("File already exists")
+            return "File already exists"
 
         return "File Created"
 
-    def Read(file_type = "", file_name = "") -> bytes:
+    def Read(file_type = "", file_name = ""):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
         WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
 
         folderpath = WORKER_PERSISTENT_STORAGE_PATH + environment + "/" + file_type
         filepath = folderpath + "/" + file_name
-
-        f = open(filepath, "rb")
-        return f.read()
-
-
-
-
-
+        if file_type == "parquet":
+            start = time.perf_counter()
+            read_par_file = pd.read_parquet(filepath)
+            end = time.perf_counter()
+            loading_time = end - start
+            print(read_par_file)
+            print("Read Location Data", loading_time)
+            return pd
+        else:
+            f = open(filepath, "rb")
+            return f.read()
