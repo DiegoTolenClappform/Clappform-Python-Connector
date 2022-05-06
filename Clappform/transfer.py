@@ -145,10 +145,10 @@ class Transfer:
                 break
             else:
                 if additional == 1:
-                    version = version + "-" + additional
+                    version = version + "-" + str(additional)
                 else:
                     version = version[:-1]
-                    version = version + additional
+                    version = version + str(additional)
                 additional+=1
 
 
