@@ -164,7 +164,7 @@ class Transfer:
         t = time.time()
         timestamp_int = int(t)
         timestamp = str(timestamp_int)
-        commitMessage = app + " - " + + " published"
+        commitMessage = app + " - " + version + " published"
         configData = {
             "timestamp": timestamp_int,
             "created_by": settings.username,
