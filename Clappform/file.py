@@ -26,6 +26,8 @@ class File:
         if overwrite or not os.path.exists(filepath):
             if file_type == "parquet":
                 content.to_parquet(filepath,compression='gzip')
+            elif file_type == "pickle":
+                content.to_pickle(filepath,compression='gzip')
             else:
                 with open(filepath, 'wb') as fd:
                     fd.write(bytes(content, 'utf-8'))
@@ -47,7 +49,15 @@ class File:
             end = time.perf_counter()
             loading_time = end - start
             print(read_par_file)
-            print("Read Location Data", loading_time)
+            print("Read parquet data", loading_time)
+            return pd
+        elif file_type == "pickle":
+            start = time.perf_counter()
+            read_par_file = pd.read_pickle(filepath)
+            end = time.perf_counter()
+            loading_time = end - start
+            print(read_par_file)
+            print("Read pickle data", loading_time)
             return pd
         else:
             f = open(filepath, "rb")
