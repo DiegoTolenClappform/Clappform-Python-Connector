@@ -17,9 +17,9 @@ class Transfer:
     def CreateApp(app, version):
         if not Auth.tokenValid():
             Auth.refreshToken()
-        gitUrl = "https://raw.githubusercontent.com/bharkema/clappform_models"
+        gitUrl = "https://raw.githubusercontent.com/ClappFormOrg/framework_models"
 
-        URI = gitUrl + "/main/Apps/" + app +"/" + version + "/_config.json"
+        URI = gitUrl + "/main/app/" + app +"/" + version + "/_config.json"
         gitresponse = requests.get(URI)
         if gitresponse.status_code != 200:
             print("ERROR: FILE NOT FOUND")
@@ -64,9 +64,9 @@ class Transfer:
         timestamp_string = str(timestamp)
 
         # Start by creating all URLS to use
-        app_URI = gitUrl + "/main/Apps/" + app +"/" + version + "/" + timestamp_string + "_app.json"
-        collection_URI = gitUrl + "/main/Apps/" + app +"/" + version + "/" + timestamp_string + "_collections.json"
-        permission_URI = gitUrl + "/main/Apps/" + app +"/" + version + "/" + timestamp_string + "_permission.json"
+        app_URI = gitUrl + "/main/app/" + app +"/" + version + "/" + timestamp_string + "_app.json"
+        collection_URI = gitUrl + "/main/app/" + app +"/" + version + "/" + timestamp_string + "_collections.json"
+        permission_URI = gitUrl + "/main/app/" + app +"/" + version + "/" + timestamp_string + "_permission.json"
 
         git_app_response = requests.get(app_URI)
         if git_app_response.status_code != 200:
@@ -132,13 +132,13 @@ class Transfer:
         # Generate version for app,
         today = date.today()
         version = today.strftime("%y%m%d") # yymmdd
-        gitUrl = "https://raw.githubusercontent.com/bharkema/clappform_models"
+        gitUrl = "https://raw.githubusercontent.com/ClappFormOrg/framework_models"
 
         # Check if app with version already exists, if it does, append number
         versionInUse = True
         additional = 1
         while versionInUse:
-            URI = gitUrl + "/main/Apps/" + app +"/" + version + "/_config.json"
+            URI = gitUrl + "/main/app/" + app +"/" + version + "/_config.json"
             gitresponse = requests.get(URI)
             if gitresponse.status_code != 200:
                 versionInUse = False
@@ -157,14 +157,14 @@ class Transfer:
         versionData = responseVersion.json()["data"]
 
         g = Github(gitAccessToken)
-        repo = g.get_repo("bharkema/Clappform_models")
+        repo = g.get_repo("ClappFormOrg/framework_models")
         branch = repo.get_branch(branch="main")
         branch.commit
 
         t = time.time()
         timestamp_int = int(t)
         timestamp = str(timestamp_int)
-        commitMessage = "New App"
+        commitMessage = app + " - " + + " published"
         configData = {
             "timestamp": timestamp_int,
             "created_by": settings.username,
@@ -174,16 +174,16 @@ class Transfer:
             "web_server_version": versionData["web_server"],
             "deployable": "true"
         }
-        appFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_app.json"
+        appFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_app.json"
         repo.create_file(appFilePath, commitMessage, '[' + json.dumps(responseApp) + ']', branch="main")
 
-        collectionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_collections.json"
+        collectionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_collections.json"
         repo.create_file(collectionFilePath, commitMessage, json.dumps(collectionData), branch="main")
 
-        permissionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_permission.json" # Restore requires permission file
+        permissionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_permission.json" # Restore requires permission file
         repo.create_file(permissionFilePath, commitMessage, "[{}]", branch="main")
 
-        configFilePath = "Apps/" + app + "/" + version +"/_config.json"
+        configFilePath = "app/" + app + "/" + version +"/_config.json"
         repo.create_file(configFilePath, commitMessage, json.dumps(configData), branch="main")
 
         return 200
