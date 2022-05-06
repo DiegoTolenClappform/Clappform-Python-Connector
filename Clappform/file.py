@@ -28,6 +28,8 @@ class File:
                 content.to_parquet(filepath,compression='gzip')
             elif file_type == "pickle":
                 content.to_pickle(filepath,compression='gzip')
+            elif file_type == "csv":
+                content.to_csv(filepath,compression='gzip')
             else:
                 with open(filepath, 'wb') as fd:
                     fd.write(bytes(content, 'utf-8'))
@@ -43,22 +45,21 @@ class File:
 
         folderpath = WORKER_PERSISTENT_STORAGE_PATH + environment + "/" + file_type
         filepath = folderpath + "/" + file_name
-        if file_type == "parquet":
+
+        if file_type=="parquet" or file_type=="pickle" or file_type=="csv":
             start = time.perf_counter()
-            read_par_file = pd.read_parquet(filepath)
+            if file_type == "parquet":
+                read_par_file = pd.read_parquet(filepath)
+            elif file_type == "pickle":
+                read_par_file = pd.read_pickle(filepath)
+            elif file_type == "csv":
+                read_par_file = pd.read_csv(filepath)
             end = time.perf_counter()
             loading_time = end - start
-            print(read_par_file)
-            print("Read parquet data", loading_time)
-            return pd
-        elif file_type == "pickle":
-            start = time.perf_counter()
-            read_par_file = pd.read_pickle(filepath)
-            end = time.perf_counter()
-            loading_time = end - start
-            print(read_par_file)
-            print("Read pickle data", loading_time)
-            return pd
+            print("Read " + file_type + " data in: ", loading_time)
+            return read_par_file
         else:
             f = open(filepath, "rb")
             return f.read()
+
+
