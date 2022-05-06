@@ -152,7 +152,7 @@ class Transfer:
             "deployable": "true"
         }
         appFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_app.json"
-        repo.create_file(appFilePath, commitMessage, json.dumps(responseApp), branch="main")
+        repo.create_file(appFilePath, commitMessage, '[' + json.dumps(responseApp) + ']', branch="main")
 
         collectionFilePath = "Apps/" + app + "/" + version +"/"+ timestamp + "_collections.json"
         repo.create_file(collectionFilePath, commitMessage, json.dumps(collectionData), branch="main")
