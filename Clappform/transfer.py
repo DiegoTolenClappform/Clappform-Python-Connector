@@ -131,17 +131,17 @@ class Transfer:
 
         # Generate version for app,
         today = date.today()
-        version = today.strftime("%y/%m/%d") # yy/mm/dd
+        version = today.strftime("%y%m%d") # yymmdd
         gitUrl = "https://raw.githubusercontent.com/bharkema/clappform_models"
 
         # Check if app with version already exists, if it does, append number
-        versionInvalid = True
+        versionInUse = True
         additional = 1
-        while versionInvalid:
+        while versionInUse:
             URI = gitUrl + "/main/Apps/" + app +"/" + version + "/_config.json"
             gitresponse = requests.get(URI)
             if gitresponse.status_code != 200:
-                versionInvalid = False
+                versionInUse = False
                 break
             else:
                 if additional == 1:
