@@ -25,13 +25,13 @@ class File:
 
         if overwrite or not os.path.exists(filepath):
             if file_type == "parquet":
-                content.to_parquet(filepath,compression='gzip')
+                content.to_parquet(filepath + '.gzip',compression='gzip')
             elif file_type == "pickle":
-                content.to_pickle(filepath,compression='gzip')
+                content.to_pickle(filepath + '.gzip',compression='gzip')
             elif file_type == "csv":
-                content.to_csv(filepath,compression='gzip')
+                content.to_csv(filepath + '.gzip',compression='gzip')
             else:
-                with open(filepath, 'wb') as fd:
+                with open(filepath + '.' + file_type, 'wb') as fd:
                     fd.write(bytes(content, 'utf-8'))
         else:
             return "File already exists"
@@ -49,17 +49,17 @@ class File:
         if file_type=="parquet" or file_type=="pickle" or file_type=="csv":
             start = time.perf_counter()
             if file_type == "parquet":
-                read_par_file = pd.read_parquet(filepath)
+                read_par_file = pd.read_parquet(filepath + '.gzip')
             elif file_type == "pickle":
-                read_par_file = pd.read_pickle(filepath)
+                read_par_file = pd.read_pickle(filepath + '.gzip')
             elif file_type == "csv":
-                read_par_file = pd.read_csv(filepath)
+                read_par_file = pd.read_csv(filepath + '.gzip')
             end = time.perf_counter()
             loading_time = end - start
             print("Read " + file_type + " data in: ", loading_time)
             return read_par_file
         else:
-            f = open(filepath, "rb")
+            f = open(filepath + '.' + file_type, "rb")
             return f.read()
 
 

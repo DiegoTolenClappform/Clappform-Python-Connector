@@ -4,6 +4,7 @@ from .app import App
 import requests
 import json
 from github import Github
+from datetime import date
 import time
 
 
@@ -120,13 +121,35 @@ class Transfer:
 
         return response.json()
 
-    def PublishApp(app = "", gitAccessToken = "", version = ""):
+    def PublishApp(app = "", gitAccessToken = ""):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         # Get app and collection data
         responseApp = App(app).ReadOne(extended=True)
         collectionData = responseApp["collections"]
+
+        # Generate version for app,
+        today = date.today()
+        version = today.strftime("%y/%m/%d") # yy/mm/dd
+        gitUrl = "https://raw.githubusercontent.com/bharkema/clappform_models"
+
+        # Check if app with version already exists, if it does, append number
+        versionInvalid = True
+        additional = 1
+        while versionInvalid:
+            URI = gitUrl + "/main/Apps/" + app +"/" + version + "/_config.json"
+            gitresponse = requests.get(URI)
+            if gitresponse.status_code != 200:
+                versionInvalid = False
+                break
+            else:
+                if additional == 1:
+                    version = version + "-" + additional
+                else:
+                    version = version[:-1]
+                    version = version + additional
+                additional+=1
 
 
         # Get current version of api, web_application and web_server
