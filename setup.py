@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="Clappform",
-    version="1.9.0",
+    version="1.9.1",
     description="Clappform API Connector",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -28,6 +28,7 @@ setup(
     install_requires=[
         "pandas",
         "PyGithub"
+        "pyarrow"
     ],
     include_package_data=True,
 )
