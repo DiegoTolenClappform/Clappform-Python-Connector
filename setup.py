@@ -18,7 +18,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     url="https://github.com/DiegoTolenClappform/Clappform-Python-Connector",
-    download_url = 'https://github.com/DiegoTolenClappform/Clappform-Python-Connector/archive/' + _version.__version__ + '.tar.gz',
+    download_url = 'https://github.com/DiegoTolenClappform/Clappform-Python-Connector/archive/' + _version.__version__ + ".dev" + '.tar.gz',
     author="Clappform",
     author_email="info@clappform.com",
     keywords="api connector",
