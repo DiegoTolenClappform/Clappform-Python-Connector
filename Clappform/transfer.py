@@ -30,7 +30,6 @@ class Transfer:
 
         # Check if app is delpoyable
         config_json = json.loads(content)
-        print(config_json)
 
         if config_json["deployable"] == False:
             print("NOT DEPLOYABLE RAISING ERROR")
@@ -110,7 +109,7 @@ class Transfer:
         })
 
         # return response so pypi user can still let his code run.
-        print(response.json())
+        print(response)
 
         return response.json()
 
