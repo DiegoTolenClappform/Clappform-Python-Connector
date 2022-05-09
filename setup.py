@@ -1,16 +1,13 @@
 from setuptools import setup
-
+import _version
 
 def readme():
     with open("README.md") as f:
         return f.read()
 
-__version__ = "1.9.100"
-
-
 setup(
     name="Clappform",
-    version=__version__ + ".dev",
+    version=_version.__version__ + ".dev",
     description="Clappform API Connector",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -21,7 +18,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     url="https://github.com/DiegoTolenClappform/Clappform-Python-Connector",
-    download_url = 'https://github.com/DiegoTolenClappform/Clappform-Python-Connector/archive/' + __version__ + '.tar.gz',
+    download_url = 'https://github.com/DiegoTolenClappform/Clappform-Python-Connector/archive/' + _version.__version__ + '.tar.gz',
     author="Clappform",
     author_email="info@clappform.com",
     keywords="api connector",
