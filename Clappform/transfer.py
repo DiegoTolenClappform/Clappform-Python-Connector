@@ -91,6 +91,14 @@ class Transfer:
         except:
             print("ERROR: Permission file not found")
 
+
+        # Read app, if app exists delete it
+        try:
+            responseApp = App(app).ReadOne(extended=False)
+            responseApp = App(app).Delete()
+        except:
+            pass
+
         # Send files to API for recontruction.
         url = settings.baseURL + "api/transfer/app"
         response = requests.post(url, json={
