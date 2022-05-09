@@ -33,30 +33,30 @@ class Transfer:
 
         if config_json["deployable"] == False:
             print("NOT DEPLOYABLE RAISING ERROR")
-            raise Exception('Not deployable')
+            raise Exception('ERROR: Not deployable')
 
         version_url = settings.baseURL + "api/version"
         version_response = requests.get(version_url,headers={
                 'Authorization': 'Bearer ' + settings.token
         })
-        if version_response.status_code != 200:
-            print("Not able to get version")
-            print(version_response.json())
-            raise Exception('Not deployable')
 
-        # Temporarily turned off
+        if version_response.status_code != 200:
+            print(version_response)
+            raise Exception('ERROR: Can\'t retrieve framework version')
+
+        # # Temporarily turned off
         # version_json = version_response.json()["data"]
         # if(config_json["web_application_version"] != version_json["web_application"]):
         #     print("NOT DEPLOYABLE")
-        #     raise Exception('Not deployable')
+        #     raise Exception('ERROR: Web_application version does not comply. Current: ' + version_json["web_application"] + ' , Source: ' + config_json["web_application_version"] + '.')
 
         # if(config_json["web_server_version"] != version_json["web_server"]):
         #     print("NOT DEPLOYABLE")
-        #     raise Exception('Not deployable')
+        #     raise Exception('ERROR: Web_server version does not comply. Current: ' + version_json["web_server"] + ' , Source: ' + config_json["web_server"] + '.')
 
         # if(config_json["api_version"] != version_json["api"]):
         #     print("NOT DEPLOYABLE")
-        #     raise Exception('Not deployable')
+        #     raise Exception('ERROR: API version does not comply. Current: ' + version_json["api"] + ' , Source: ' + config_json["api"] + '.')
 
         # App is deployable. Start getting config data from Github.
         timestamp = 0
@@ -109,9 +109,14 @@ class Transfer:
         })
 
         # return response so pypi user can still let his code run.
-        print(response)
-
-        return response.json()
+        try:
+            response = response.json()
+            print(response)
+        except json.JSONDecodeError as e:
+            print(e)
+            response = {}
+            pass
+        return response
 
     def PublishApp(app = "", gitAccessToken = ""):
         if not Auth.tokenValid():
@@ -146,7 +151,11 @@ class Transfer:
 
         # Get current version of framework api, web_application and web_server
         responseVersion = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
-        versionData = responseVersion.json()["data"]
+        try:
+            versionData = responseVersion.json()["data"]
+        except json.JSONDecodeError as e:
+            print(e)
+            return
 
         branch = repo.get_branch(branch="main")
         branch.commit
