@@ -6,7 +6,7 @@ import json
 from github import Github
 from datetime import date
 import time
-
+import base64
 
 class Transfer:
     id = None
@@ -14,18 +14,22 @@ class Transfer:
     def __init__(self, transfer = None):
         self.id = transfer
 
-    def CreateApp(app, version):
+    def CreateApp(app, version, gitAccessToken = ""):
         if not Auth.tokenValid():
             Auth.refreshToken()
-        gitUrl = "https://raw.githubusercontent.com/ClappFormOrg/framework_models"
 
-        URI = gitUrl + "/main/app/" + app +"/" + version + "/_config.json"
-        gitresponse = requests.get(URI)
-        if gitresponse.status_code != 200:
-            print("ERROR: FILE NOT FOUND")
+        g = Github(gitAccessToken)
+        repo = g.get_repo("ClappFormOrg/framework_models")
+
+        try:
+            gitresponse = repo.get_contents("/app/" + app + "/" + version + "/_config.json")
+            content = base64.b64decode(gitresponse.content)
+        except:
+            print("ERROR: Config file not found")
+            return
 
         # Check if app is delpoyable
-        config_json = gitresponse.json()
+        config_json = json.loads(content)
         print(config_json)
 
         if config_json["deployable"] == False:
@@ -63,48 +67,29 @@ class Transfer:
 
         timestamp_string = str(timestamp)
 
-        # Start by creating all URLS to use
-        app_URI = gitUrl + "/main/app/" + app +"/" + version + "/" + timestamp_string + "_app.json"
-        collection_URI = gitUrl + "/main/app/" + app +"/" + version + "/" + timestamp_string + "_collections.json"
-        permission_URI = gitUrl + "/main/app/" + app +"/" + version + "/" + timestamp_string + "_permission.json"
-
-        git_app_response = requests.get(app_URI)
-        if git_app_response.status_code != 200:
-            print("ERROR CODE NOT 200 FILE NOT FOUND")
-            raise Exception('Not deployable')
-
-        app_json = git_app_response.json()
-
-        git_collection_response = requests.get(collection_URI)
-        if git_collection_response.status_code != 200:
-            print("ERROR CODE NOT 200 FILE NOT FOUND")
-            raise Exception('Not deployable')
-
-        collection_json = git_collection_response.json()
-
-        git_permission_response = requests.get(permission_URI)
-        if git_permission_response.status_code != 200:
-            print("ERROR CODE NOT 200 FILE NOT FOUND")
-            raise Exception('Not deployable')
-
-        permission_json = git_permission_response.json()
-
-        # Check validity of JSON downloads by dumping content
+        app_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_app.json"
         try:
-            test = json.dumps(app_json, separators=(',', ':'))
-        #     print(test)
+            gitresponse = repo.get_contents(app_URI)
+            temp = base64.b64decode(gitresponse.content)
+            app_json = json.loads(temp)
         except:
-            print("Not able to dump json. App data might be invalid")
+            print("ERROR: App file not found")
+
+        collection_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_collections.json"
         try:
-            test = json.dumps(collection_json, separators=(',', ':'))
-        #     print(test)
+            gitresponse = repo.get_contents(collection_URI)
+            temp = base64.b64decode(gitresponse.content)
+            collection_json = json.loads(temp)
         except:
-            print("Not able to dump json. Collection data might be invalid")
+            print("ERROR: Collection file not found")
+
+        permission_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_permission.json"
         try:
-            test = json.dumps(permission_json, separators=(',', ':'))
-        #     print(test)
+            gitresponse = repo.get_contents(permission_URI)
+            temp = base64.b64decode(gitresponse.content)
+            permission_json = json.loads(temp)
         except:
-            print("Not able to dump json. Permission data might be invalid")
+            print("ERROR: Permission file not found")
 
         # Send files to API for recontruction.
         url = settings.baseURL + "api/transfer/app"
@@ -129,35 +114,33 @@ class Transfer:
         responseApp = App(app).ReadOne(extended=True)
         collectionData = responseApp["collections"]
 
+        g = Github(gitAccessToken)
+        repo = g.get_repo("ClappFormOrg/framework_models")
         # Generate version for app,
         today = date.today()
         version = today.strftime("%y%m%d") # yymmdd
-        gitUrl = "https://raw.githubusercontent.com/ClappFormOrg/framework_models"
 
         # Check if app with version already exists, if it does, append number
         versionInUse = True
         additional = 1
         while versionInUse:
-            URI = gitUrl + "/main/app/" + app +"/" + version + "/_config.json"
-            gitresponse = requests.get(URI)
-            if gitresponse.status_code != 200:
-                versionInUse = False
-                break
-            else:
+            try:
+                gitresponse = repo.get_contents("/app/" + app + "/" + version + "/_config.json")
                 if additional == 1:
                     version = version + "-" + str(additional)
                 else:
                     version = version[:-1]
                     version = version + str(additional)
                 additional+=1
+            except:
+                versionInUse = False
+                pass
+                break
 
-
-        # Get current version of api, web_application and web_server
+        # Get current version of framework api, web_application and web_server
         responseVersion = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
         versionData = responseVersion.json()["data"]
 
-        g = Github(gitAccessToken)
-        repo = g.get_repo("ClappFormOrg/framework_models")
         branch = repo.get_branch(branch="main")
         branch.commit
 
@@ -165,6 +148,7 @@ class Transfer:
         timestamp_int = int(t)
         timestamp = str(timestamp_int)
         commitMessage = app + " - " + version + " published"
+
         configData = {
             "timestamp": timestamp_int,
             "created_by": settings.username,
