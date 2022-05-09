@@ -7,6 +7,7 @@ def readme():
 
 __version__ = "1.9.100"
 
+
 setup(
     name="Clappform",
     version=__version__ + ".dev",
