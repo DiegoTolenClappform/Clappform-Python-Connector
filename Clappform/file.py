@@ -16,7 +16,7 @@ class File:
     def Upload(content, file_type, file_name, overwrite=False):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
-        WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
+        WORKER_PERSISTENT_STORAGE_PATH = "/data/azure/"
 
         if not Auth.tokenValid():
             Auth.refreshToken()
@@ -44,7 +44,7 @@ class File:
     def Read(file_type = "", file_name = ""):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
-        WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
+        WORKER_PERSISTENT_STORAGE_PATH = "/data/azure/"
 
         folderpath = WORKER_PERSISTENT_STORAGE_PATH + environment + "/" + file_type
         filepath = folderpath + "/" + file_name
@@ -69,17 +69,19 @@ class File:
     def AppendParquet(content, file_type, file_name, writer):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
-        WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
+        WORKER_PERSISTENT_STORAGE_PATH = "/data/azure/"
 
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         folderpath = WORKER_PERSISTENT_STORAGE_PATH + environment + "/" + file_type
         filepath = folderpath + "/" + file_name + '.gzip'
-
+        os.makedirs(folderpath, exist_ok = True)
         table = pa.Table.from_pandas(content)
         if writer is None:
             writer = pq.ParquetWriter(filepath, table.schema)
         writer.write_table(table=table)
 
         return writer
+
+
