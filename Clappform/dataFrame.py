@@ -39,8 +39,8 @@ class _DataFrame:
                 Auth.refreshToken()
             response = ""
 
+            res_data = []
             try:
-                res_data = []
                 response = requests.get(
                     settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(i * itemsPerRun
                    ) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower(),
@@ -50,8 +50,11 @@ class _DataFrame:
                 for item in response.json()["data"]["items"]:
                     res_data.append(item["data"])
                 yield pd.DataFrame(res_data)
-            except:
-                print(response.status_code)
+            except requests.exceptions.JSONDecodeError as exception:
+                print("Cant parse")
+            except requests.exceptions.RequestException as exception:
+                resp = exception.response
+                print(resp.status_code)
 
 
         # def Worker(self, i, itemsPerRun, original):
