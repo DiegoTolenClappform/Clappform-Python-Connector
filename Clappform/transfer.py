@@ -112,8 +112,7 @@ class Transfer:
         try:
             response = response.json()
             print(response)
-        except json.JSONDecodeError as e:
-            print(e)
+        except:
             response = {}
             pass
         return response
@@ -153,8 +152,7 @@ class Transfer:
         responseVersion = requests.get(settings.baseURL + 'api/version/', headers={'Authorization': 'Bearer ' + settings.token})
         try:
             versionData = responseVersion.json()["data"]
-        except json.JSONDecodeError as e:
-            print(e)
+        except:
             return
 
         branch = repo.get_branch(branch="main")

@@ -23,62 +23,80 @@ class _DataFrame:
         self.collection_id = collection
 
     def Read(self, original=True, itemsPerRun=100, n_jobs = 1):
-
         self.data = []
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.get(
-            settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(
-                0) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower(),
+        response_total = requests.get(
+            settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=false',
             headers={
                 'Authorization': 'Bearer ' + settings.token
             })
 
-        for item in response.json()["data"]["items"]:
-            self.data.append(item["data"])
 
-        def Worker(self, i, itemsPerRun, original):
+        for i in range(1, math.ceil(response_total.json()["total"] / itemsPerRun)):
             if not Auth.tokenValid():
                 Auth.refreshToken()
             response = ""
 
             try:
+                res_data = []
                 response = requests.get(
-                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(
-                    i * itemsPerRun) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower(),
+                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(i * itemsPerRun
+                   ) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower(),
                     headers={
                         'Authorization': 'Bearer ' + settings.token
                 })
                 for item in response.json()["data"]["items"]:
-                    self.data.append(item["data"])
+                    res_data.append(item["data"])
+                yield res_data
             except:
                 print(response.status_code)
 
-        if n_jobs > multiprocessing.cpu_count() or n_jobs < -1:
-            print("The maximum CPU which can be used is: {0}".format(multiprocessing.cpu_count()))
-            return
 
-        if n_jobs == -1:
-            n_jobs = 16
-            # n_jobs = multiprocessing.cpu_count()
+        # def Worker(self, i, itemsPerRun, original):
+        #     if not Auth.tokenValid():
+        #         Auth.refreshToken()
+        #     response = ""
 
-        if "total" in response.json().keys():
-            threadlist = []
-            for i in range(1, math.ceil(response.json()["total"] / itemsPerRun)):
-                threadlist.append(Thread(target=Worker, args=(self, i, itemsPerRun, original)))
-                if i % n_jobs == 0:
-                    for thread in threadlist:
-                        thread.start()
-                    for thread in threadlist:
-                        thread.join()
-                    threadlist = []
-            for thread in threadlist:
-                thread.start()
-            for thread in threadlist:
-                thread.join()
+        #     try:
+        #         res_data = []
+        #         response = requests.get(
+        #             settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(
+        #             i * itemsPerRun) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower(),
+        #             headers={
+        #                 'Authorization': 'Bearer ' + settings.token
+        #         })
+        #         for item in response.json()["data"]["items"]:
+        #             res_data.append(item["data"])
+        #         yield res_data
+        #     except:
+        #         print(response.status_code)
 
-        return pd.DataFrame(self.data)
+        # if n_jobs > multiprocessing.cpu_count() or n_jobs < -1:
+        #     print("The maximum CPU which can be used is: {0}".format(multiprocessing.cpu_count()))
+        #     return
+
+        # if n_jobs == -1:
+        #     n_jobs = 16
+        #     # n_jobs = multiprocessing.cpu_count()
+
+        # if "total" in response.json().keys():
+        #     threadlist = []
+        #     for i in range(1, math.ceil(response.json()["total"] / itemsPerRun)):
+        #         threadlist.append(Thread(target=Worker, args=(self, i, itemsPerRun, original)))
+        #         if i % n_jobs == 0:
+        #             for thread in threadlist:
+        #                 thread.start()
+        #             for thread in threadlist:
+        #                 thread.join()
+        #             threadlist = []
+        #     for thread in threadlist:
+        #         thread.start()
+        #     for thread in threadlist:
+        #         thread.join()
+
+        # return pd.DataFrame(self.data)
 
     def Synchronize(self, dataframe, n_jobs=1):
         if not Auth.tokenValid():
