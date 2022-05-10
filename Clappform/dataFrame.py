@@ -54,8 +54,6 @@ class _DataFrame:
                 print(i, response.elapsed)
                 time.sleep(response.elapsed)
                 yield pd.DataFrame(res_data)
-            except requests.exceptions.JSONDecodeError as exception:
-                print("Cant parse")
             except requests.exceptions.RequestException as exception:
                 resp = exception.response
                 print(resp.status_code)
