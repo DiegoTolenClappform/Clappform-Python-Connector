@@ -66,7 +66,7 @@ class File:
             return f.read()
 
 
-    def AppendParquet(content, file_type, file_name):
+    def AppendParquet(content, file_type, file_name, writer):
         # Use globals from worker, remove if worker allows these globals
         environment  = "local"
         WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
@@ -75,7 +75,7 @@ class File:
             Auth.refreshToken()
 
         folderpath = WORKER_PERSISTENT_STORAGE_PATH + environment + "/" + file_type
-        filepath = folderpath + "/" + file_name
+        filepath = folderpath + "/" + file_name + '.gzip'
 
         table = pa.Table.from_pandas(content)
         if writer is None:
