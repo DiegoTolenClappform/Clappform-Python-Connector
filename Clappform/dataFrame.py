@@ -51,7 +51,6 @@ class _DataFrame:
                     res_data.append(item["data"])
 
                 # Sleep for elapsed time to not get marked as DDOS
-                print(i, response.elapsed.total_seconds())
                 time.sleep(response.elapsed.total_seconds())
                 yield pd.DataFrame(res_data)
             except requests.exceptions.RequestException as exception:
