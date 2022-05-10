@@ -2,7 +2,10 @@ from .settings import settings
 from .auth import Auth
 import os
 import time
+import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 class File:
     id = None
@@ -63,3 +66,20 @@ class File:
             return f.read()
 
 
+    def AppendParquet(content, file_type, file_name):
+        # Use globals from worker, remove if worker allows these globals
+        environment  = "local"
+        WORKER_PERSISTENT_STORAGE_PATH = "./data/azure/"
+
+        if not Auth.tokenValid():
+            Auth.refreshToken()
+
+        folderpath = WORKER_PERSISTENT_STORAGE_PATH + environment + "/" + file_type
+        filepath = folderpath + "/" + file_name
+
+        table = pa.Table.from_pandas(content)
+        if writer is None:
+            writer = pq.ParquetWriter(filepath, table.schema)
+        writer.write_table(table=table)
+
+        return writer
