@@ -34,7 +34,7 @@ class _DataFrame:
             })
 
 
-        for i in range(1, math.ceil(response_total.json()["items"] / itemsPerRun)):
+        for i in range(1, math.ceil(response_total.json()["data"]["items"] / itemsPerRun)):
             if not Auth.tokenValid():
                 Auth.refreshToken()
             response = ""
