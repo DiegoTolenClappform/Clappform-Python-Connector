@@ -82,6 +82,22 @@ class Transfer:
         except:
             print("ERROR: Collection file not found")
 
+        form_template_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_form_template.json"
+        try:
+            gitresponse = repo.get_contents(form_template_URI)
+            temp = base64.b64decode(gitresponse.content)
+            formtemplate_json = json.loads(temp)
+        except:
+            print("ERROR: Form templates file not found")
+
+        action_flow_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_action_flows.json"
+        try:
+            gitresponse = repo.get_contents(action_flow_URI)
+            temp = base64.b64decode(gitresponse.content)
+            actionflow_json = json.loads(temp)
+        except:
+            print("ERROR: Action Flow file not found")
+
         permission_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_permission.json"
         try:
             gitresponse = repo.get_contents(permission_URI)
@@ -101,9 +117,11 @@ class Transfer:
         # Send files to API for recontruction.
         url = settings.baseURL + "api/transfer/app"
         response = requests.post(url, json={
-            "app_json": json.dumps(app_json, separators=(',', ':')),
-            "collection_json": json.dumps(collection_json, separators=(',', ':')),
-            "permission_json": json.dumps(permission_json, separators=(',', ':'))
+            "apps": json.dumps(app_json, separators=(',', ':')),
+            "collections": json.dumps(collection_json, separators=(',', ':')),
+            "form_templates": json.dumps(formtemplate_json, separators=(',', ':')),
+            "action_flows": json.dumps(actionflow_json, separators=(',', ':')),
+            "permissions": json.dumps(permission_json, separators=(',', ':'))
         },headers={
             'Authorization': 'Bearer ' + settings.token
         })
@@ -124,6 +142,30 @@ class Transfer:
         # Get app and collection data
         responseApp = App(app).ReadOne(extended=True)
         collectionData = responseApp["collections"]
+
+        # Get form_template and action_flow data used by app
+        form_templates = []
+        action_flows = []
+        for group in responseApp["groups"]:
+            for page in group["pages"]:
+                for row in page["rows"]:
+                    for module in row["modules"]: # Check for form templates
+                        if module["type"]["type"] == "Questionnaire":
+                            form_id = module["selection"]["template"]["id"]
+                            # Curl request to get data of all form templates
+                            response = requests.get(settings.baseUrl + 'api/form_template/' + str(form_id), headers={'Authorization': 'Bearer ' + settings.token})
+                            form_templates.append(response.json()["data"])
+                    for module in row["modules"]: # Check for form templates
+                        action_buttons_present = "actionButtons" in module["selection"]
+                        if(action_buttons_present):
+                            for actions in module["selection"]["actionButtons"]:
+                                for attribute, value in actions.items():
+                                    if attribute =="actions":
+                                        for keys in value:
+                                            if keys["actionflow"]["id"] != None:
+                                                action_flow_id = keys["actionflow"]["id"]
+                                                response = requests.get(settings.baseUrl + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+                                                action_flows.append(response.json()["data"])
 
         g = Github(gitAccessToken)
         repo = g.get_repo("ClappFormOrg/framework_models")
@@ -170,13 +212,20 @@ class Transfer:
             "api_version": versionData["api"],
             "web_application_version": versionData["web_application"],
             "web_server_version": versionData["web_server"],
-            "deployable": "true"
+            "deployable": "true",
+            "notes": ""
         }
         appFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_app.json"
         repo.create_file(appFilePath, commitMessage, '[' + json.dumps(responseApp) + ']', branch="main")
 
         collectionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_collections.json"
         repo.create_file(collectionFilePath, commitMessage, json.dumps(collectionData), branch="main")
+
+        formtempateFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_form_template.json"
+        repo.create_file(formtempateFilePath, commitMessage, json.dumps(form_templates), branch="main")
+
+        actionflowFilePath = "app/" + app + "/" + version +"/"+ timestamp + "action_flows.json"
+        repo.create_file(actionflowFilePath, commitMessage, json.dumps(action_flows), branch="main")
 
         permissionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_permission.json" # Restore requires permission file
         repo.create_file(permissionFilePath, commitMessage, "[{}]", branch="main")
