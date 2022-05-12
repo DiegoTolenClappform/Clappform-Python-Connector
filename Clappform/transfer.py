@@ -153,7 +153,7 @@ class Transfer:
                         if module["type"]["type"] == "Questionnaire":
                             form_id = module["selection"]["template"]["id"]
                             # Curl request to get data of all form templates
-                            response = requests.get(settings.baseUrl + 'api/form_template/' + str(form_id), headers={'Authorization': 'Bearer ' + settings.token})
+                            response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id), headers={'Authorization': 'Bearer ' + settings.token})
                             form_templates.append(response.json()["data"])
                     for module in row["modules"]: # Check for form templates
                         action_buttons_present = "actionButtons" in module["selection"]
@@ -164,7 +164,7 @@ class Transfer:
                                         for keys in value:
                                             if keys["actionflow"]["id"] != None:
                                                 action_flow_id = keys["actionflow"]["id"]
-                                                response = requests.get(settings.baseUrl + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+                                                response = requests.get(settings.baseURL + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
                                                 action_flows.append(response.json()["data"])
 
         g = Github(gitAccessToken)
