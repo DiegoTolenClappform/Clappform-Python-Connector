@@ -231,7 +231,7 @@ class Transfer:
         actionflowFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_action_flows.json"
         repo.create_file(actionflowFilePath, commitMessage, json.dumps(action_flows), branch="main")
 
-        importentryFilePath = "app/" + app + "/" + version +"/"+ timestamp + "import_entry.json"
+        importentryFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_import_entry.json"
         repo.create_file(importentryFilePath, commitMessage, json.dumps(import_entries), branch="main")
 
         configFilePath = "app/" + app + "/" + version +"/_config.json"
