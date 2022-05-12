@@ -224,7 +224,7 @@ class Transfer:
         formtempateFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_form_template.json"
         repo.create_file(formtempateFilePath, commitMessage, json.dumps(form_templates), branch="main")
 
-        actionflowFilePath = "app/" + app + "/" + version +"/"+ timestamp + "action_flows.json"
+        actionflowFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_action_flows.json"
         repo.create_file(actionflowFilePath, commitMessage, json.dumps(action_flows), branch="main")
 
         permissionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_permission.json" # Restore requires permission file
