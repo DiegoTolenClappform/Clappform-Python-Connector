@@ -98,21 +98,13 @@ class Transfer:
         except:
             print("ERROR: Action Flow file not found")
 
-        permission_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_permission.json"
+        import_entry_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_import_entry.json"
         try:
-            gitresponse = repo.get_contents(permission_URI)
+            gitresponse = repo.get_contents(import_entry_URI)
             temp = base64.b64decode(gitresponse.content)
-            permission_json = json.loads(temp)
+            import_json = json.loads(temp)
         except:
-            print("ERROR: Permission file not found")
-
-
-        # Read app, if app exists delete it
-        try:
-            responseApp = App(app).ReadOne(extended=False)
-            responseApp = App(app).Delete()
-        except:
-            pass
+            print("ERROR: Import entry file not found")
 
         # Send files to API for recontruction.
         url = settings.baseURL + "api/transfer/app"
@@ -121,7 +113,7 @@ class Transfer:
             "collections": json.dumps(collection_json, separators=(',', ':')),
             "form_templates": json.dumps(formtemplate_json, separators=(',', ':')),
             "action_flows": json.dumps(actionflow_json, separators=(',', ':')),
-            "permissions": json.dumps(permission_json, separators=(',', ':'))
+            "import_entry": json.dumps(import_json, separators=(',', ':'))
         },headers={
             'Authorization': 'Bearer ' + settings.token
         })
@@ -140,8 +132,11 @@ class Transfer:
             Auth.refreshToken()
 
         # Get app and collection data
-        responseApp = App(app).ReadOne(extended=True)
-        collectionData = responseApp["collections"]
+        try:
+            responseApp = App(app).ReadOne(extended=True)
+            collectionData = responseApp["collections"]
+        except:
+            return 404
 
         # Get form_template and action_flow data used by app
         form_templates = []
@@ -166,6 +161,15 @@ class Transfer:
                                                 action_flow_id = keys["actionflow"]["id"]
                                                 response = requests.get(settings.baseURL + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
                                                 action_flows.append(response.json()["data"])
+
+        # Get import_entry data used by app
+        import_entries = []
+        response = requests.get(settings.baseURL + 'api/import?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+        response = response.json()["data"]
+        for ie in response:
+            for coll in collectionData:
+                if ie["collection"] == coll["slug"]:
+                    import_entries.append(ie)
 
         g = Github(gitAccessToken)
         repo = g.get_repo("ClappFormOrg/framework_models")
@@ -213,8 +217,8 @@ class Transfer:
             "web_application_version": versionData["web_application"],
             "web_server_version": versionData["web_server"],
             "deployable": "true",
-            "notes": ""
         }
+
         appFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_app.json"
         repo.create_file(appFilePath, commitMessage, '[' + json.dumps(responseApp) + ']', branch="main")
 
@@ -227,8 +231,8 @@ class Transfer:
         actionflowFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_action_flows.json"
         repo.create_file(actionflowFilePath, commitMessage, json.dumps(action_flows), branch="main")
 
-        permissionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_permission.json" # Restore requires permission file
-        repo.create_file(permissionFilePath, commitMessage, "[{}]", branch="main")
+        importentryFilePath = "app/" + app + "/" + version +"/"+ timestamp + "import_entry.json"
+        repo.create_file(importentryFilePath, commitMessage, json.dumps(import_entries), branch="main")
 
         configFilePath = "app/" + app + "/" + version +"/_config.json"
         repo.create_file(configFilePath, commitMessage, json.dumps(configData), branch="main")
