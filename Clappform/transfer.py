@@ -164,12 +164,15 @@ class Transfer:
 
         # Get import_entry data used by app
         import_entries = []
-        response = requests.get(settings.baseURL + 'api/import?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
-        response = response.json()["data"]
-        for ie in response:
-            for coll in collectionData:
-                if ie["collection"] == coll["slug"]:
-                    import_entries.append(ie)
+        try:
+            response = requests.get(settings.baseURL + 'api/import?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+            response = response.json()["data"]
+            for ie in response:
+                for coll in collectionData:
+                    if ie["collection"] == coll["slug"]:
+                        import_entries.append(ie)
+        except:
+            pass
 
         g = Github(gitAccessToken)
         repo = g.get_repo("ClappFormOrg/framework_models")
