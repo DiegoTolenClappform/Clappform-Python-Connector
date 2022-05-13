@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from .settings import settings
 from .auth import Auth
 from .app import App
@@ -222,22 +223,45 @@ class Transfer:
             "deployable": "true",
         }
 
+        responseApp = '[' + json.dumps(responseApp) + ']'
+        if responseApp == '[]':
+            responseApp = 'null'
+
         appFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_app.json"
-        repo.create_file(appFilePath, commitMessage, '[' + json.dumps(responseApp) + ']', branch="main")
+        repo.create_file(appFilePath, commitMessage, responseApp, branch="main")
+
+        collectionData = json.dumps(collectionData)
+        if collectionData == '[]':
+            collectionData = 'null'
 
         collectionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_collections.json"
-        repo.create_file(collectionFilePath, commitMessage, json.dumps(collectionData), branch="main")
+        repo.create_file(collectionFilePath, commitMessage, collectionData, branch="main")
+
+        form_templates = json.dumps(form_templates)
+        if form_templates == '[]':
+            form_templates = 'null'
 
         formtempateFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_form_template.json"
-        repo.create_file(formtempateFilePath, commitMessage, json.dumps(form_templates), branch="main")
+        repo.create_file(formtempateFilePath, commitMessage, form_templates, branch="main")
+
+        action_flows = json.dumps(action_flows)
+        if action_flows == '[]':
+            action_flows = 'null'
 
         actionflowFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_action_flows.json"
-        repo.create_file(actionflowFilePath, commitMessage, json.dumps(action_flows), branch="main")
+        repo.create_file(actionflowFilePath, commitMessage, action_flows, branch="main")
+
+
+        import_entries = json.dumps(import_entries)
+        if import_entries == '[]':
+            import_entries = 'null'
 
         importentryFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_import_entry.json"
-        repo.create_file(importentryFilePath, commitMessage, json.dumps(import_entries), branch="main")
+        repo.create_file(importentryFilePath, commitMessage, import_entries, branch="main")
+
+        configData = json.dumps(configData)
 
         configFilePath = "app/" + app + "/" + version +"/_config.json"
-        repo.create_file(configFilePath, commitMessage, json.dumps(configData), branch="main")
+        repo.create_file(configFilePath, commitMessage, configData, branch="main")
 
         return 200
