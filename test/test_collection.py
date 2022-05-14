@@ -3,19 +3,16 @@ import unittest
 from unittest.mock import patch
 
 from .context import Clappform
+from .settings import settings
 from Clappform.app import App
 
 class TestCollection(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
         print("=====[ Setting up vars for collection testing ]=====")
-        self.url = "http://localhost/"
-        self.username = ""
-        self.password = ""
-        self.app_id = "test_app"
-        self.app_name = "Test App"
-        self.app_desc = "This app gives ... insights on ... subject."
-        self.app_icon = "home-icon"
+        self.url = settings.baseURL
+        self.username = settings.username
+        self.password = settings.password
         self.collection_id = "test_collection"
         self.collection_name = "Test Collection"
         self.collection_desc = "This app gives ... insights on ... subject."
@@ -34,7 +31,7 @@ class TestCollection(unittest.TestCase):
         print(App("clappform_logs").Collection("api_logs").ReadOne(extended=True))
         assert App("clappform_logs").Collection("api_logs").ReadOne(extended=True) is not None
         print("=====[ Done reading one collection in enviroment ]=====")
-        
+
     def test_createOne(self):
         print("=====[ Creating one collection in enviroment ]=====")
         self.created_collection = App("default").Collection().Create(slug=self.collection_id, name=self.collection_desc, description=self.collection_desc, encryption=self.collection_encryption, logging=self.collection_logging, sources=self.collection_sources)

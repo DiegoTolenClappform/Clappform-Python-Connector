@@ -598,13 +598,13 @@ class _DataFrame:
     def DeleteItems(self, ItemIDArray=[]):
         if not Auth.tokenValid():
             Auth.refreshToken()
-        
+
         if len(ItemIDArray) > 0:
 
             x = {
                 "data": ItemIDArray
-            }        
-                    
+            }
+
             itemIDString = json.dumps(x)
 
             response = requests.delete(settings.baseURL + "api/item/" + self.app_id + "/" + self.collection_id +"/dataframe",

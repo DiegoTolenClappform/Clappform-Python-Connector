@@ -3,15 +3,16 @@ import unittest
 from unittest.mock import patch
 
 from .context import Clappform
+from .settings import settings
 from Clappform.auth import Auth as Auth
 
 class TestAuth(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
         print("=====[ Setting up vars for Auth testing ]=====")
-        self.url = "http://localhost/"
-        self.username = ""
-        self.password = ""
+        self.url = settings.baseURL
+        self.username = settings.username
+        self.password = settings.password
         print("=====[ Done setting up vars for Auth testing ]=====")
 
     def test_tokenInValid(self):

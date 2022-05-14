@@ -3,15 +3,16 @@ import unittest
 from unittest.mock import patch
 
 from .context import Clappform
+from .settings import settings
 from Clappform.app import App
 
 class TestApp(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
         print("=====[ Setting up vars for App testing ]=====")
-        self.url = "http://localhost/"
-        self.username = ""
-        self.password = ""
+        self.url = settings.baseURL
+        self.username = settings.username
+        self.password = settings.password
         self.app_id = "test_app"
         self.app_name = "Test App"
         self.app_desc = "This app gives ... insights on ... subject."
@@ -34,7 +35,7 @@ class TestApp(unittest.TestCase):
         print(App("default").ReadOne(extended=True))
         assert App("default").ReadOne(extended=True) is not None
         print("=====[ Done reading one app in enviroment ]=====")
-        
+
     def test_createOne(self):
         print("=====[ Creating one app in enviroment ]=====")
         self.created_app = App.Create(id=self.app_id, name=self.app_name, description=self.app_desc, icon=self.app_icon)
