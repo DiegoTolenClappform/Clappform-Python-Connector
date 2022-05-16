@@ -6,3 +6,4 @@ class settings:
         global username
         global usertestingpassword
         global usertestingemail
+        global twilliotemplate

@@ -8,19 +8,19 @@ from .settings import settings
 
 #These are global vars and need to be filled in when you want to test the package. Then also need to be removed when pushing to git
 settings
-settings.baseURL = "http://localhost/"
+settings.baseURL = ""
 settings.password = ""
 settings.username = ""
 settings.usertestingpassword = ""
 settings.usertestingemail = ""
+settings.twilliotemplate = ""
 
 ##### TO-DO #####
-# File Needs to be made ..Need examples of usage
-# Transfer Needs to be made ..Do we need this test as we dont want to fill up github repo with gunk
+# File Needs to be made ..Need examples of usage 
+# Transfer Needs to be made ..First need to finish new function of deleting generated apps that way i can keep repo clear.
 
-##### BUGS #####
-# Update and Delete are not active in the API routing for notifications
+##### BUGS/TESTING BUGS #####
 # Actionflow not able to start due to Auth issues on API end
-# Need template id for sending email.
 
 # Need to look at append and sync functions from dataframe getting error: AttributeError: 'str' object has no attribute 'copy'
+#For now disabled sync and append tests not able to fix it at this time

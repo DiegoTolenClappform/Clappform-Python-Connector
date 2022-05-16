@@ -13,7 +13,12 @@ class TestMail(unittest.TestCase):
         self.url = settings.baseURL
         self.username = settings.username
         self.password = settings.password
-        self.template_id = ""
+        self.template_id = settings.twilliotemplate
+        self.recipientname = "Tester"
+        self.recipientmail = "newob01@hotmail.nl"
+        self.mailsubject = "Your Example Order Confirmation"
+        self.content = ""
+        self.sender = "Clappform"
         Clappform.Auth(baseURL=self.url, username=self.username, password=self.password)
         print("=====[ Done setting up vars for Mail testing ]=====")
 
@@ -31,8 +36,24 @@ class TestMail(unittest.TestCase):
         # print("=====[ Done reading one mail ]=====")
 
     def test_create(self):
+        templatejson = {
+            "BODY" : self.content,
+            "SENDER" : self.sender,
+            "TO": self.recipientname,
+            "SUBJECT": self.mailsubject
+        }
+
+        tojson = {
+            "name": self.recipientname, 
+            "email": self.recipientmail
+        }
+
+        fromjson = {
+            "name": "Automatic testing pypi package", 
+            "email": "info@clappform.com"
+        }
         print("=====[ Sending email ]=====")
-        self.assertEqual(Email.Create( template_id=self.template_id, tojson={}, templatejson={}, fromjson={}), "Mail is send", "Should be correct message")
+        self.assertEqual(Email.Create(templateid=self.template_id, tojson=tojson, templatejson=templatejson, fromjson=fromjson), "Mail is send", "Should be correct message")
         print("=====[ Done sending email ]=====")
 
 

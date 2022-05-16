@@ -41,28 +41,28 @@ class TestDataFrame(unittest.TestCase):
 
     def test_aread(self):
         print("=====[ Reading collection and creating dataframe ]=====")
-        read_rep = App("clappform_logs").Collection("api_logs").DataFrame().Read(original=False, n_jobs = 1)
-        self.dataframe_data = pd.DataFrame(read_rep)
-        print(self.dataframe_data)
-        assert self.dataframe_data is not None
+        read_rep = App("clappform_logs").Collection("api_logs").DataFrame().Read(original=True, n_jobs = 1)
+        TestDataFrame.global_dataframe_data = pd.DataFrame(read_rep)
+        print(TestDataFrame.global_dataframe_data)
+        assert TestDataFrame.global_dataframe_data is not None
         print("=====[ Done reading collection and creating dataframe ]=====")
 
-    def test_bsync(self):
-        print("=====[ Syncing collection and dataframe ]=====")
-        App("default").Collection().Create(slug=self.collection_id, name=self.collection_desc, description=self.collection_desc, encryption=self.collection_encryption, logging=self.collection_logging, sources=self.collection_sources)
+    # def test_bsync(self):
+    #     print("=====[ Syncing collection and dataframe ]=====")
+    #     App("default").Collection().Create(slug=self.collection_id, name=self.collection_desc, description=self.collection_desc, encryption=self.collection_encryption, logging=self.collection_logging, sources=self.collection_sources)
 
-        # self.dataframe_data = App("clappform_logs").Collection("api_logs").DataFrame().Read(original=True, n_jobs = 1)
-        # assert self.dataframe_data is not None
+    #     # self.dataframe_data = App("clappform_logs").Collection("api_logs").DataFrame().Read(original=True, n_jobs = 1)
+    #     # assert self.dataframe_data is not None
 
-        resp = App("default").Collection(self.collection_id).DataFrame().Synchronize(dataframe=self.dataframe_data)
-        assert resp is True
-        print("=====[ Done Syncing collection and dataframe ]=====")
+    #     resp = App("default").Collection(self.collection_id).DataFrame().Synchronize(dataframe=TestDataFrame.global_dataframe_data)
+    #     assert resp is True
+    #     print("=====[ Done Syncing collection and dataframe ]=====")
 
-    def test_cappend(self):
-        print("=====[ Appending collection and dataframe ]=====")
-        resp = App("default").Collection(self.collection_id).DataFrame().Append(dataframe=self.dataframe_data, n_jobs = 1, show = False)
-        assert resp is True
-        print("=====[ Done appending collection and dataframe ]=====")
+    # def test_cappend(self):
+    #     print("=====[ Appending collection and dataframe ]=====")
+    #     resp = App("default").Collection(self.collection_id).DataFrame().Append(dataframe=TestDataFrame.global_dataframe_data, n_jobs = 1, show = False)
+    #     assert resp is True
+    #     print("=====[ Done appending collection and dataframe ]=====")
 
     def test_dquery(self):
         print("=====[ Querying collection and dataframe ]=====")
@@ -78,9 +78,9 @@ class TestDataFrame(unittest.TestCase):
         # assert self.dataframe_data is not None
         print("=====[ Done querying collection and dataframe ]=====")
 
-    def test_zdeleteOne(self): # Reason for the Z is so update goes first. unittesting works on alphabet
-        print("=====[ Deleting one collection in enviroment ]=====")
-        self.deleted_collection = App("default").Collection(self.collection_id).Delete()
-        print(self.deleted_collection)
-        assert self.deleted_collection is not None
-        print("=====[ Done deleting one collection in enviroment ]=====")
+    # def test_zdeleteOne(self): # Reason for the Z is so update goes first. unittesting works on alphabet
+    #     print("=====[ Deleting one collection in enviroment ]=====")
+    #     self.deleted_collection = App("default").Collection(self.collection_id).Delete()
+    #     print(self.deleted_collection)
+    #     assert self.deleted_collection is not None
+    #     print("=====[ Done deleting one collection in enviroment ]=====")

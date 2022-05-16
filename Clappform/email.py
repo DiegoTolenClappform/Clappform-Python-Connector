@@ -43,6 +43,7 @@ class Email:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
+
         data = {
             "template_id" : templateid,
             "personalizations": [{
@@ -52,7 +53,11 @@ class Email:
             "from": fromjson
         }
 
-        rep = requests.post('https://api.sendgrid.com/v3/mail/send', json=data, headers={'Authorization': 'Bearer ' + os.getenv("SENDGRID_API_KEY")})
+        response = requests.get(settings.baseURL + 'api/message/key', headers={'Authorization': 'Bearer ' + settings.token})
+        if response.status_code != 200:
+            return "Not able to get API key"
+
+        rep = requests.post('https://api.sendgrid.com/v3/mail/send', json=data, headers={'Authorization': 'Bearer ' +  response.json()["data"]["API_key"]})
 
         if rep.status_code is 202:
             return "Mail is send"
