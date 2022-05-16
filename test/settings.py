@@ -4,3 +4,5 @@ class settings:
         global baseURL
         global password
         global username
+        global usertestingpassword
+        global usertestingemail

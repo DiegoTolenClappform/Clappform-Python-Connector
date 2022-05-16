@@ -8,17 +8,10 @@ class User:
     def __init__(self, user = None):
         self.id = user
 
-    def Create(clappformuri, authpassword, email, firstname, lastname, phone, password):
-        rep = requests.post(clappformuri + 'api/user/auth', json={
-            'username': "public@clappform-system.com",
-            'password': authpassword
-        })
-
-        if rep.json()["code"] is not 200:
-            raise Exception(rep.json()["message"])
-
-        token = rep.json()["data"]["access_token"]
-
+    def Create(clappformuri, email, firstname, lastname, phone, password):
+        if not Auth.tokenValid():
+            Auth.refreshToken()
+            
         response = requests.post(clappformuri + 'api/user', json={
                 'email': email,
                 'first_name': firstname,
@@ -27,10 +20,10 @@ class User:
                 'password': password,
                 'roles': ["public"]
             }, headers={
-                'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + settings.token
             })
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return response.json()
         else:
             return response.json()["message"]

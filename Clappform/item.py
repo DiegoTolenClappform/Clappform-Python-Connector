@@ -46,7 +46,7 @@ class _Item:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.post(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.collection_id + '/' + self.id, json={
+        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.collection_id + '/' + self.id, json={
             "data": data
         }, headers={
             'Authorization': 'Bearer ' + settings.token

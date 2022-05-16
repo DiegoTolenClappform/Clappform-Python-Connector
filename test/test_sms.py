@@ -30,7 +30,9 @@ class TestSMS(unittest.TestCase):
 
     def test_create(self):
         print("=====[ Sending SMS ]=====")
-        self.assertEqual(SMS.Create(user='d.tolen@clappform.com', content='Data has been updated'))
+        rep = SMS.Create(user='d.tolen@clappform.com', content='Data has been updated')
+        print(rep)
+        assert rep is not None
         print("=====[ Done sending SMS ]=====")
 
 

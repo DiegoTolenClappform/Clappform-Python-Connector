@@ -15,8 +15,15 @@ class TestAuth(unittest.TestCase):
         self.password = settings.password
         print("=====[ Done setting up vars for Auth testing ]=====")
 
-    def test_tokenInValid(self):
+    def test_atokenInValid(self):
         print("=====[ Testing token check invalid ]=====")
         self.assertEqual(Auth.tokenValid(), False, "Should be False")
         print("=====[ Done testing token check invalid ]=====")
+
+    def test_loginAuth(self):
+        print("=====[ Testing login ]=====")
+        rep = Auth(baseURL=self.url, username=self.username, password=self.password)
+        print(rep)
+        assert rep is not None
+        print("=====[ Done testing login ]=====")
 

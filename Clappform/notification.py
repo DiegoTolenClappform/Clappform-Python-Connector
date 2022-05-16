@@ -15,7 +15,7 @@ class Notification:
 
         response = requests.get(settings.baseURL + 'api/message?type=notification', headers={'Authorization': 'Bearer ' + settings.token})
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             if "data" in response.json():
                 return response.json()["data"]
             else: 
@@ -31,7 +31,7 @@ class Notification:
         extended = str(extended).lower()
         response = requests.get(settings.baseURL + 'api/message/' + str(self.id) + '?extended=' + extended, headers={'Authorization': 'Bearer ' + settings.token})
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return response.json()["data"]
         else:
             raise Exception(response.json()["message"])
@@ -49,8 +49,8 @@ class Notification:
             'Authorization': 'Bearer ' + settings.token
         })
 
-        if response.json()["code"] is 200:
-            return Notification(id)
+        if response.json()["code"] == 200:
+            return response.json()["data"]["id"]
         else:
             raise Exception(response.json()["message"]) 
 
@@ -59,13 +59,13 @@ class Notification:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.put(settings.baseURL + 'api/message/' + self.id, json={
+        response = requests.put(settings.baseURL + 'api/message/' + str(self.id), json={
             "is_opened": is_opened
         }, headers={
             'Authorization': 'Bearer ' + settings.token
         })
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return Notification(id)
         else:
             raise Exception(response.json()["message"])
@@ -75,9 +75,9 @@ class Notification:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.delete(settings.baseURL + 'api/message/' + self.id, headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.delete(settings.baseURL + 'api/message/' + str(self.id), headers={'Authorization': 'Bearer ' + settings.token})
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return True
         else:
             raise Exception(response.json()["message"])
