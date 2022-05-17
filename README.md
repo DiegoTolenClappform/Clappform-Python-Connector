@@ -95,10 +95,10 @@ Clappform.App("test_app").Collection("test_collection").Update(name="Collection"
 ```
 
 ### Delete
-The Delete() function returns True upon successful deletion and raises an exception otherwise. For instance an exception will be thrown if the collection couldn't be found. The collection's slug needs to have been passed to the class in order to delete the collection.
+The Delete() function returns True on successful deletion and otherwise throws an exception. For example, an exception will be thrown if the collection could not be found. The slug of the collection must have been passed to the class to delete the collection. If the collection is used by modules, the optional parameters 'slug' and 'app' can be used to indicate which collection and app the modules should be updated to. If not set, the function refuses to delete the collection and returns a list of all modules associated with the collection. In the event that these modules are no longer needed, the user must manually delete these modules.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").Delete()
+Clappform.App("test_app").Collection("test_collection").Delete(slug="new_collection_slug", app="new_app_id")
 ```
 
 ### Empty
@@ -174,10 +174,11 @@ Clappform.App("test_app").Collection("test_collection").Item("test_item").Delete
 
 ## DataFrame
 ### Read
-The Read() function returns a pandas dataframe with all the data stored in the collection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured. The parameter 'n_jobs' is the amount of threads that will be used.
+The Read() function returns a pandas dataframe with all the data stored in the collection in iterations using yield. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured. The parameter 'n_jobs' is the amount of threads that will be used.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").DataFrame().Read(Original=True, n_jobs = 1)
+for data in Clappform.App("test_app").Collection("test_collection").DataFrame().Read(Original=True, n_jobs = 1):
+    print(data)
 ```
 
 ### Synchronize
