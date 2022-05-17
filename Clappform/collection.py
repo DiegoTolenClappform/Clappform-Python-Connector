@@ -113,7 +113,7 @@ class _Collection:
             raise Exception(response.json()["message"])
 
 
-    def Delete(self, slug = None, app = None):
+    def Delete(self, slug = None, app = None, delete = None):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -124,9 +124,14 @@ class _Collection:
         if app is not None:
             properties["overwrite_app"] = app
 
+        if delete is not None:
+            properties["delete_modules"] = True
+
         response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.id, json=properties, headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] is 200:
+            if "data" in response.json():
+                raise Exception(response.json())
             return True
         else:
             raise Exception(response.json()["message"])
