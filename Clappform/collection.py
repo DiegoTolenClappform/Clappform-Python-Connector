@@ -113,11 +113,18 @@ class _Collection:
             raise Exception(response.json()["message"])
 
 
-    def Delete(self):
+    def Delete(self, slug = None, app = None):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.id, headers={'Authorization': 'Bearer ' + settings.token})
+        properties = {}
+        if slug is not None:
+            properties["overwrite_collection"] = slug
+
+        if app is not None:
+            properties["overwrite_app"] = app
+
+        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.id, json=properties, headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] is 200:
             return True
