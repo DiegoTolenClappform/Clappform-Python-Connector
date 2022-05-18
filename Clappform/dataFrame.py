@@ -41,7 +41,6 @@ class _DataFrame:
             res_data = []
             try:
                 fullUrl = settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str( i * itemsPerRun ) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower()
-                print(fullUrl)
                 response = requests.get(
                     fullUrl,
                     headers={
@@ -50,7 +49,6 @@ class _DataFrame:
                 for item in response.json()["data"]["items"]:
                     res_data.append(item["data"])
 
-                print(res_data)
                 # Sleep for elapsed time to not get marked as DDOS
                 time.sleep(response.elapsed.total_seconds())
                 yield pd.DataFrame(res_data)
