@@ -33,8 +33,10 @@ class _DataFrame:
                 'Authorization': 'Bearer ' + settings.token
             })
 
-
-        for i in range(1, math.ceil(response_total.json()["data"]["items"] / itemsPerRun)):
+        total_count = math.ceil(response_total.json()["data"]["items"] / itemsPerRun)
+        if total_count < 1:
+            total_count = 1
+        for i in range(1, total_count):
             if not Auth.tokenValid():
                 Auth.refreshToken()
             response = ""
