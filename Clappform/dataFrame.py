@@ -50,6 +50,7 @@ class _DataFrame:
                 for item in response.json()["data"]["items"]:
                     res_data.append(item["data"])
 
+                print(res_data)
                 # Sleep for elapsed time to not get marked as DDOS
                 time.sleep(response.elapsed.total_seconds())
                 yield pd.DataFrame(res_data)

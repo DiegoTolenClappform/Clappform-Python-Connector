@@ -95,7 +95,7 @@ Clappform.App("test_app").Collection("test_collection").Update(name="Collection"
 ```
 
 ### Delete
-The Delete() function returns True on successful deletion and otherwise throws an exception. For example, an exception will be thrown if the collection could not be found. The slug of the collection must have been passed to the class to delete the collection. If the collection is used by modules, the function raises an error and two options exists; either update or delete the related module. To update the related modules specify the parameters 'slug' and 'app'. To delete the related modules simply set the parameter 'delete' to True. If neither option is set, the function refuses to delete the collection and returns a list of all modules associated with the collection.
+The Delete() function returns True on successful deletion and otherwise throws an exception. For example, an exception will be thrown if the collection could not be found. The slug of the collection must have been passed to the class to delete the collection. If the collection is used by modules, the function returns an error message and two options are available: update the related module or delete it. To update the related modules, specify the parameters 'slug' and 'app'. To delete the related modules, set the 'delete' parameter to True. If neither option is set, the function refuses to delete the collection and returns a list of all modules associated with the collection. In case both update AND delete parameters are passed, the function overrides the delete.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").Delete()
