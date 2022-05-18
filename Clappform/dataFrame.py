@@ -41,9 +41,10 @@ class _DataFrame:
 
             res_data = []
             try:
+                fullUrl = settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str( i * itemsPerRun ) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower()
+                print(fullUrl)
                 response = requests.get(
-                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str(i * itemsPerRun
-                   ) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower(),
+                    fullUrl,
                     headers={
                         'Authorization': 'Bearer ' + settings.token
                 })
