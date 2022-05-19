@@ -16,8 +16,8 @@ class TestActionflow(unittest.TestCase):
         self.actionflowid = 1
         Clappform.Auth(baseURL=self.url, username=self.username, password=self.password)
         print("=====[ Done setting up vars for App testing ]=====")
-    
-    # Actionflow test has been disabled due to API error will reaneble when API bug is fixed. 
+
+    # Actionflow test has been disabled due to worker not being usable from localhost.
     # def test_actionFlow(self):
     #     print("=====[ Starting actionflow ]=====")
     #     rep = Actionflow.Start(self.actionflowid)

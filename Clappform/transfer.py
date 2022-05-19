@@ -150,6 +150,12 @@ class Transfer:
                             # Curl request to get data of all form templates
                             response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
                             form_templates.append(response.json()["data"])
+                        elif module["type"]["type"] == "Data Table":
+                            if "id" in module["selection"]["add"]["template"]:
+                                form_id = module["selection"]["add"]["template"]["id"]
+                                # Curl request to get data of all form templates
+                                response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+                                form_templates.append(response.json()["data"])
                     for module in row["modules"]: # Check for form templates
                         action_buttons_present = "actionButtons" in module["selection"]
                         if(action_buttons_present):
