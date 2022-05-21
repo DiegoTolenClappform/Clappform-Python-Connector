@@ -290,7 +290,8 @@ class _DataFrame:
             threadlist = []
             for x in range(0 + offset, len(dataframe.index) + offset):
                 threadlist.append(Thread(target=Worker, args=(self, amountSent, offset, dataframe, count)))
-                if i % n_jobs == 0:
+                # used to be i % n_jobs == 0: <= Did NOT work now it does
+                if n_jobs == 0:
                     for thread in threadlist:
                         thread.start()
                     for thread in threadlist:

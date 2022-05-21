@@ -16,11 +16,11 @@ settings.usertestingemail = ""
 settings.twilliotemplate = ""
 
 ##### TO-DO #####
-# File Needs to be made ..Need examples of usage 
+# File Needs to be made ..Need examples of usage
 # Transfer Needs to be made ..First need to finish new function of deleting generated apps that way i can keep repo clear.
 
 ##### BUGS/TESTING BUGS #####
-# Actionflow not able to start due to Auth issues on API end
+# Appear to be no more known bugs
 
-# Need to look at append and sync functions from dataframe getting error: AttributeError: 'str' object has no attribute 'copy'
-#For now disabled sync and append tests not able to fix it at this time
+##### NOTES #####
+# Actionflow tests diabled because worker is not connected to localhost

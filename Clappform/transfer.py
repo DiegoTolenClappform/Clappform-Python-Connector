@@ -261,7 +261,7 @@ class Transfer:
 
         return 200
 
-    def DeleteApp(app, version, gitAccessToken ):
+    def DeleteApp(app = "", version = "", gitAccessToken = "" ):
         g = Github(gitAccessToken)
         repo = g.get_repo("bharkema/Clappform_models")
         contents = repo.get_contents("app/" + app + "/" + version)
