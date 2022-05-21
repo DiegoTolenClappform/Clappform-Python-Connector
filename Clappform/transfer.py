@@ -260,3 +260,12 @@ class Transfer:
         repo.create_file(configFilePath, commitMessage, configData, branch="main")
 
         return 200
+
+    def DeleteApp(app, version, gitAccessToken ):
+        g = Github(gitAccessToken)
+        repo = g.get_repo("bharkema/Clappform_models")
+        contents = repo.get_contents("app/" + app + "/" + version)
+        for x in contents:
+            repo.delete_file(x.path, "removed: " + x.path , x.sha, branch="main")
+
+        return True
