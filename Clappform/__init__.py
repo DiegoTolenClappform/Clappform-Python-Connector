@@ -11,3 +11,4 @@ from .user import User
 from .actionflow import Actionflow
 
 settings
+settings.token = ""
