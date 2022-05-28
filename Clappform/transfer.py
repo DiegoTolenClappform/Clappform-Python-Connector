@@ -7,6 +7,9 @@ from github import Github
 from datetime import date
 import time
 import base64
+from simplecrypt import encrypt, decrypt
+import os
+import pandas as pd
 
 class Transfer:
     id = None
@@ -14,7 +17,7 @@ class Transfer:
     def __init__(self, transfer = None):
         self.id = transfer
 
-    def CreateApp(app, version, gitAccessToken = ""):
+    def CreateApp(app, version, gitAccessToken = "", password=""):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -118,6 +121,28 @@ class Transfer:
             'Authorization': 'Bearer ' + settings.token
         })
 
+        # Append Data sets to the collections
+        if response.status_code == 200:
+            if password != "":
+                collection_data = json.dumps(collection_json)
+                for collection in collection_data:
+                    g = Github(gitAccessToken)
+                    Datablob_uri = "/app/" + app +"/" + version + "/" + timestamp_string + "_" + collection["slug"] + ".csv"
+
+                    gitresponse = repo.get_contents(Datablob_uri)
+                    url_download = gitresponse.download_url
+                    rep = requests.get(url_download)
+                    decrypted_data = decrypt(password, rep.content).decode('utf8')
+
+                    f = open(collection["slug"] + '.csv', "a")
+                    f.write(decrypted_data)
+                    f.close()
+
+                    df = pd.read_csv(collection["slug"] + '.csv', header=0)
+                    os.remove(collection["slug"] + '.csv')
+
+                    App(app).Collection(collection["slug"]).DataFrame().Append(dataframe=df, n_jobs=1, show = False)
+
         # return response so pypi user can still let his code run.
         try:
             response = response.json()
@@ -127,7 +152,7 @@ class Transfer:
             pass
         return response
 
-    def PublishApp(app = "", gitAccessToken = ""):
+    def PublishApp(app = "", gitAccessToken = "", password=""):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -228,6 +253,25 @@ class Transfer:
             "deployable": "true",
         }
 
+        # Dumping data when password is entered
+        if password != "":
+            for collection in collectionData:
+                data_empty = []
+                dataframe_copy = pd.DataFrame(data_empty)
+                for result in App(app).Collection(collection["slug"]).DataFrame().Read(original=True, n_jobs = 0):
+                    dataframe_copy = pd.concat([dataframe_copy, result], axis=0)
+
+                dataframe_copy.to_csv(collection["slug"] + '.csv')
+                data = ""
+                with open(collection["slug"] + '.csv', 'r') as file:
+                    data = file.read()
+
+                encrypted_data = encrypt(password, data)
+                os.remove(collection["slug"] + '.csv')
+
+                FilePath = "app/" + app + "/" + version +"/"+ timestamp + "_" + collection["slug"] + ".csv"
+                repo.create_file(FilePath, commitMessage, encrypted_data, branch="main")
+
         # Create App file
         responseApp = '[' + json.dumps(responseApp) + ']'
         appFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_app.json"
@@ -242,7 +286,6 @@ class Transfer:
         form_templates = json.dumps(form_templates)
         formtempateFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_form_template.json"
         repo.create_file(formtempateFilePath, commitMessage, form_templates, branch="main")
-
 
         # Create Action Flow file
         action_flows = json.dumps(action_flows)
