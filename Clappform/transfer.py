@@ -7,7 +7,7 @@ from github import Github
 from datetime import date
 import time
 import base64
-from simplecrypt import encrypt, decrypt
+# from simplecrypt import encrypt, decrypt
 import os
 import pandas as pd
 
@@ -243,7 +243,7 @@ class Transfer:
         timestamp_int = int(t)
         timestamp = str(timestamp_int)
         commitMessage = app + " - " + version + " published"
-        domain_name = settings.baseURL[7:]
+        domain_name = settings.baseURL[8:-1]
 
         configData = {
             "timestamp": timestamp_int,
