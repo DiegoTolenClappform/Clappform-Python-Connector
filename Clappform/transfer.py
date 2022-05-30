@@ -153,7 +153,7 @@ class Transfer:
             pass
         return response
 
-    def PublishApp(app = "", gitAccessToken = "", password=""):
+    def PublishApp(app = "", gitAccessToken = "", dataexport=False):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -285,7 +285,18 @@ class Transfer:
         configFilePath = domain_name + "/" + app + "/" + version +"/_config.json"
         repo.create_file(configFilePath, commitMessage, configData, branch="main")
         
-        # # Dumping data when password is entered
+        # Dumping data when password is entered
+        if dataexport:
+            dataset_response = requests.post(settings.baseURL + 'api/transfer/' + app +'/data', json={
+                "app_version": version,
+                "app_environment": domain_name,
+                "app_timestamp": timestamp
+            }, headers={'Authorization': 'Bearer ' + settings.token})
+            
+            if dataset_response.status_code != 200:
+                yield dataset_response.json()
+
+
         # if password != "":
         #     for collection in collectionData:
         #         data_empty = []
