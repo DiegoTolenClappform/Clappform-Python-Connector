@@ -127,7 +127,7 @@ class Transfer:
             dataset_response = requests.post(settings.baseURL + 'api/transfer/' + app +'/data', json={
                 "app_version": version,
                 "app_environment": enviroment,
-                "app_timestamp": timestamp
+                "app_timestamp": timestamp_string
             }, headers={'Authorization': 'Bearer ' + settings.token})
             
             # if dataset_response.status_code != 200:
