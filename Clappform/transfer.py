@@ -234,6 +234,9 @@ class Transfer:
         commitMessage = app + " - " + version + " published"
         domain_name = settings.baseURL[8:-1]
 
+        if domain_name == "eb_server":
+            domain_name = "localhost"
+
         configData = {
             "timestamp": timestamp_int,
             "created_by": settings.username,
