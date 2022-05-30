@@ -129,9 +129,6 @@ class Transfer:
                 "app_environment": enviroment,
                 "app_timestamp": timestamp_string
             }, headers={'Authorization': 'Bearer ' + settings.token})
-            
-            # if dataset_response.status_code != 200:
-            #     yield dataset_response.json()
 
         # return response so pypi user can still let his code run.
         try:
@@ -287,11 +284,16 @@ class Transfer:
 
         return 200
 
-    def DeleteApp(environment="", app = "", version = "", gitAccessToken = "" ):
+    def DeleteApp(enviroment="", app = "", version = "", gitAccessToken = "" ):
         g = Github(gitAccessToken)
         repo = g.get_repo("ClappFormOrg/framework_models")
-        contents = repo.get_contents(environment + "/" + app + "/" + version)
+        contents = repo.get_contents(enviroment + "/" + app + "/" + version)
         for x in contents:
             repo.delete_file(x.path, "removed: " + x.path , x.sha, branch="main")
+
+        requests.post(settings.baseURL + '/api/transfer/' + app +'/data', json={
+            "app_version": version,
+            "app_environment": enviroment
+        }, headers={'Authorization': 'Bearer ' + settings.token})
 
         return True
