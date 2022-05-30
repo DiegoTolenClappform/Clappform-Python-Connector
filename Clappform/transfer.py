@@ -17,7 +17,7 @@ class Transfer:
     def __init__(self, transfer = None):
         self.id = transfer
 
-    def CreateApp(app, version, gitAccessToken = "", password=""):
+    def CreateApp(enviroment="", app="", version="", gitAccessToken = "", password=""):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -25,7 +25,7 @@ class Transfer:
         repo = g.get_repo("ClappFormOrg/framework_models")
 
         try:
-            gitresponse = repo.get_contents("/app/" + app + "/" + version + "/_config.json")
+            gitresponse = repo.get_contents(enviroment + "/" + app + "/" + version + "/_config.json")
             content = base64.b64decode(gitresponse.content)
         except:
             print("ERROR: Config file not found")
@@ -69,7 +69,8 @@ class Transfer:
 
         timestamp_string = str(timestamp)
 
-        app_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_app.json"
+
+        app_URI = enviroment + "/" + app +"/" + version + "/" + timestamp_string + "_app.json"
         try:
             gitresponse = repo.get_contents(app_URI)
             temp = base64.b64decode(gitresponse.content)
@@ -77,7 +78,7 @@ class Transfer:
         except:
             print("ERROR: App file not found")
 
-        collection_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_collections.json"
+        collection_URI = enviroment + "/" + app +"/" + version + "/" + timestamp_string + "_collections.json"
         try:
             gitresponse = repo.get_contents(collection_URI)
             temp = base64.b64decode(gitresponse.content)
@@ -85,7 +86,7 @@ class Transfer:
         except:
             print("ERROR: Collection file not found")
 
-        form_template_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_form_template.json"
+        form_template_URI = enviroment + "/" + app +"/" + version + "/" + timestamp_string + "_form_template.json"
         try:
             gitresponse = repo.get_contents(form_template_URI)
             temp = base64.b64decode(gitresponse.content)
@@ -93,7 +94,7 @@ class Transfer:
         except:
             print("ERROR: Form templates file not found")
 
-        action_flow_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_action_flows.json"
+        action_flow_URI = enviroment + "/" + app +"/" + version + "/" + timestamp_string + "_action_flows.json"
         try:
             gitresponse = repo.get_contents(action_flow_URI)
             temp = base64.b64decode(gitresponse.content)
@@ -101,7 +102,7 @@ class Transfer:
         except:
             print("ERROR: Action Flow file not found")
 
-        import_entry_URI = "/app/" + app +"/" + version + "/" + timestamp_string + "_import_entry.json"
+        import_entry_URI = enviroment + "/" + app +"/" + version + "/" + timestamp_string + "_import_entry.json"
         try:
             gitresponse = repo.get_contents(import_entry_URI)
             temp = base64.b64decode(gitresponse.content)
@@ -121,27 +122,27 @@ class Transfer:
             'Authorization': 'Bearer ' + settings.token
         })
 
-        # Append Data sets to the collections
-        if response.status_code == 200:
-            if password != "":
-                collection_data = json.dumps(collection_json)
-                for collection in collection_data:
-                    g = Github(gitAccessToken)
-                    Datablob_uri = "/app/" + app +"/" + version + "/" + timestamp_string + "_" + collection["slug"] + ".csv"
+        # # Append Data sets to the collections
+        # if response.status_code == 200:
+        #     if password != "":
+        #         collection_data = json.dumps(collection_json)
+        #         for collection in collection_data:
+        #             g = Github(gitAccessToken)
+        #             Datablob_uri = "/app/" + app +"/" + version + "/" + timestamp_string + "_" + collection["slug"] + ".csv"
 
-                    gitresponse = repo.get_contents(Datablob_uri)
-                    url_download = gitresponse.download_url
-                    rep = requests.get(url_download)
-                    decrypted_data = decrypt(password, rep.content).decode('utf8')
+        #             gitresponse = repo.get_contents(Datablob_uri)
+        #             url_download = gitresponse.download_url
+        #             rep = requests.get(url_download)
+        #             decrypted_data = decrypt(password, rep.content).decode('utf8')
 
-                    f = open(collection["slug"] + '.csv', "a")
-                    f.write(decrypted_data)
-                    f.close()
+        #             f = open(collection["slug"] + '.csv', "a")
+        #             f.write(decrypted_data)
+        #             f.close()
 
-                    df = pd.read_csv(collection["slug"] + '.csv', header=0)
-                    os.remove(collection["slug"] + '.csv')
+        #             df = pd.read_csv(collection["slug"] + '.csv', header=0)
+        #             os.remove(collection["slug"] + '.csv')
 
-                    App(app).Collection(collection["slug"]).DataFrame().Append(dataframe=df, n_jobs=1, show = False)
+        #             App(app).Collection(collection["slug"]).DataFrame().Append(dataframe=df, n_jobs=1, show = False)
 
         # return response so pypi user can still let his code run.
         try:
@@ -242,72 +243,73 @@ class Transfer:
         timestamp_int = int(t)
         timestamp = str(timestamp_int)
         commitMessage = app + " - " + version + " published"
+        domain_name = settings.baseURL[7:]
 
         configData = {
             "timestamp": timestamp_int,
             "created_by": settings.username,
-            "enviroment": settings.baseURL,
+            "enviroment": domain_name,
             "api_version": versionData["api"],
             "web_application_version": versionData["web_application"],
             "web_server_version": versionData["web_server"],
             "deployable": "true",
         }
 
-        # Dumping data when password is entered
-        if password != "":
-            for collection in collectionData:
-                data_empty = []
-                dataframe_copy = pd.DataFrame(data_empty)
-                for result in App(app).Collection(collection["slug"]).DataFrame().Read(original=True, n_jobs = 0):
-                    dataframe_copy = pd.concat([dataframe_copy, result], axis=0)
-
-                dataframe_copy.to_csv(collection["slug"] + '.csv')
-                data = ""
-                with open(collection["slug"] + '.csv', 'r') as file:
-                    data = file.read()
-
-                encrypted_data = encrypt(password, data)
-                os.remove(collection["slug"] + '.csv')
-
-                FilePath = "app/" + app + "/" + version +"/"+ timestamp + "_" + collection["slug"] + ".csv"
-                repo.create_file(FilePath, commitMessage, encrypted_data, branch="main")
-
         # Create App file
         responseApp = '[' + json.dumps(responseApp) + ']'
-        appFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_app.json"
+        appFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_app.json"
         repo.create_file(appFilePath, commitMessage, responseApp, branch="main")
 
         # Create Collection file
         collectionData = json.dumps(collectionData)
-        collectionFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_collections.json"
+        collectionFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_collections.json"
         repo.create_file(collectionFilePath, commitMessage, collectionData, branch="main")
 
         # Create Form Template file
         form_templates = json.dumps(form_templates)
-        formtempateFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_form_template.json"
+        formtempateFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_form_template.json"
         repo.create_file(formtempateFilePath, commitMessage, form_templates, branch="main")
 
         # Create Action Flow file
         action_flows = json.dumps(action_flows)
-        actionflowFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_action_flows.json"
+        actionflowFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_action_flows.json"
         repo.create_file(actionflowFilePath, commitMessage, action_flows, branch="main")
 
         # Create Import entry file
         import_entries = json.dumps(import_entries)
-        importentryFilePath = "app/" + app + "/" + version +"/"+ timestamp + "_import_entry.json"
+        importentryFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_import_entry.json"
         repo.create_file(importentryFilePath, commitMessage, import_entries, branch="main")
 
         # Create Config file
         configData = json.dumps(configData)
-        configFilePath = "app/" + app + "/" + version +"/_config.json"
+        configFilePath = domain_name + "/" + app + "/" + version +"/_config.json"
         repo.create_file(configFilePath, commitMessage, configData, branch="main")
+        
+        # # Dumping data when password is entered
+        # if password != "":
+        #     for collection in collectionData:
+        #         data_empty = []
+        #         dataframe_copy = pd.DataFrame(data_empty)
+        #         for result in App(app).Collection(collection["slug"]).DataFrame().Read(original=True, n_jobs = 0):
+        #             dataframe_copy = pd.concat([dataframe_copy, result], axis=0)
+
+        #         dataframe_copy.to_csv(collection["slug"] + '.csv')
+        #         data = ""
+        #         with open(collection["slug"] + '.csv', 'r') as file:
+        #             data = file.read()
+
+        #         encrypted_data = encrypt(password, data)
+        #         os.remove(collection["slug"] + '.csv')
+
+        #         FilePath = "app/" + app + "/" + version +"/"+ timestamp + "_" + collection["slug"] + ".csv"
+        #         repo.create_file(FilePath, commitMessage, encrypted_data, branch="main")
 
         return 200
 
-    def DeleteApp(app = "", version = "", gitAccessToken = "" ):
+    def DeleteApp(environment="", app = "", version = "", gitAccessToken = "" ):
         g = Github(gitAccessToken)
-        repo = g.get_repo("bharkema/Clappform_models")
-        contents = repo.get_contents("app/" + app + "/" + version)
+        repo = g.get_repo("ClappFormOrg/framework_models")
+        contents = repo.get_contents(environment + "/" + app + "/" + version)
         for x in contents:
             repo.delete_file(x.path, "removed: " + x.path , x.sha, branch="main")
 
