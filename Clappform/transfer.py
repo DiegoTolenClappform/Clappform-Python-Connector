@@ -123,15 +123,15 @@ class Transfer:
         })
 
         # Append Data sets to the collections
-        if dataexport:
+        if dataexport == True:
             dataset_response = requests.post(settings.baseURL + 'api/transfer/' + app +'/data', json={
                 "app_version": version,
                 "app_environment": enviroment,
                 "app_timestamp": timestamp
             }, headers={'Authorization': 'Bearer ' + settings.token})
             
-            if dataset_response.status_code != 200:
-                yield dataset_response.json()
+            # if dataset_response.status_code != 200:
+            #     yield dataset_response.json()
 
         # return response so pypi user can still let his code run.
         try:
@@ -275,15 +275,12 @@ class Transfer:
         repo.create_file(configFilePath, commitMessage, configData, branch="main")
         
         # Dumping data when password is entered
-        if dataexport:
-            dataset_response = requests.post(settings.baseURL + 'api/transfer/' + app +'/data', json={
+        if dataexport == True:
+            dataset_response = requests.put(settings.baseURL + 'api/transfer/' + app +'/data', json={
                 "app_version": version,
                 "app_environment": domain_name,
                 "app_timestamp": timestamp
             }, headers={'Authorization': 'Bearer ' + settings.token})
-            
-            if dataset_response.status_code != 200:
-                yield dataset_response.json()
 
         return 200
 
