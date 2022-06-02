@@ -190,12 +190,14 @@ class Transfer:
         today = date.today()
         version = today.strftime("%y%m%d") # yymmdd
 
+        domain_name = settings.baseURL[8:-1]
+
         # Check if app with version already exists, if it does, append number
         versionInUse = True
         additional = 1
         while versionInUse:
             try:
-                gitresponse = repo.get_contents("/app/" + app + "/" + version + "/_config.json")
+                gitresponse = repo.get_contents("/" + domain_name + "/app/" + app + "/" + version + "/_config.json")
                 if additional == 1:
                     version = version + "-" + str(additional)
                 else:
@@ -221,7 +223,7 @@ class Transfer:
         timestamp_int = int(t)
         timestamp = str(timestamp_int)
         commitMessage = app + " - " + version + " published"
-        domain_name = settings.baseURL[8:-1]
+
 
         if domain_name == "eb_server":
             domain_name = "localhost"
@@ -265,7 +267,7 @@ class Transfer:
 
         # Create Config file
         configData = json.dumps(configData)
-        configFilePath = domain_name + "/" + app + "/" + version +"/_config.json"
+        configFilePath = domain_name + "/" + app + "/" + version + "/_config.json"
         repo.create_file(configFilePath, commitMessage, configData, branch="main")
 
         # Dumping data when password is entered
