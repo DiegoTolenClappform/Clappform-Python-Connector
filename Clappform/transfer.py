@@ -203,7 +203,7 @@ class Transfer:
         additional = 1
         while versionInUse:
             try:
-                gitresponse = repo.get_contents("localhost/app/" + app + "/" + version + "/_config.json")
+                gitresponse = repo.get_contents(domain_name + "/" + app + "/" + version + "/_config.json")
                 if additional == 1:
                     version = version + "-" + str(additional)
                 else:
