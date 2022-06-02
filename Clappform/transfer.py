@@ -192,11 +192,11 @@ class Transfer:
         version = today.strftime("%y%m%d") # yymmdd
 
         domain_name = settings.baseURL
-        re.sub("^https?:\/\/","", domain_name)
-
+        domain_name = re.sub("^https?:\/\/","", domain_name)
         if domain_name == "web_server":
             domain_name = "localhost"
         print(domain_name)
+
         # Check if app with version already exists, if it does, append number
         versionInUse = True
         additional = 1
