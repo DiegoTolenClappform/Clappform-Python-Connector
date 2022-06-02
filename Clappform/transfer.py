@@ -157,28 +157,19 @@ class Transfer:
             for page in group["pages"]:
                 for row in page["rows"]:
                     for module in row["modules"]: # Check for form templates
-                        if module["type"]["type"] == "Questionnaire":
-                            form_id = module["selection"]["template"]["id"]
-                            # Curl request to get data of all form templates
-                            response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
-                            form_templates.append(response.json()["data"])
-                        elif module["type"]["type"] == "Data Table":
-                            if "id" in module["selection"]["add"]["template"]:
-                                form_id = module["selection"]["add"]["template"]["id"]
-                                # Curl request to get data of all form templates
-                                response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
-                                form_templates.append(response.json()["data"])
-                    for module in row["modules"]: # Check for form templates
-                        action_buttons_present = "actionButtons" in module["selection"]
-                        if(action_buttons_present):
-                            for actions in module["selection"]["actionButtons"]:
-                                for attribute, value in actions.items():
-                                    if attribute =="actions":
-                                        for keys in value:
-                                            if keys["actionflow"]["id"] != None:
-                                                action_flow_id = keys["actionflow"]["id"]
-                                                response = requests.get(settings.baseURL + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
-                                                action_flows.append(response.json()["data"])
+                        actions_present = "actions" in module["selection"]
+                        if(actions_present):
+                            for action in module["selection"]["actions"]:
+                                if action["type"] == "actionflow":
+                                    action_flow_id = action["actionflowId"]
+                                    response = requests.get(settings.baseURL + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+                                    action_flows.append(response.json()["data"])
+                                elif action["type"] == "questionnaire":
+                                    print("export form templates")
+                                    # form_id = action["formtemplateId"]
+                                    # # Curl request to get data of all form templates
+                                    # response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+                                    # form_templates.append(response.json()["data"])
 
         # Get import_entry data used by app
         import_entries = []
@@ -244,36 +235,38 @@ class Transfer:
             "deployable": "true",
         }
 
+        gitFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp
+
         # Create App file
         responseApp = '[' + json.dumps(responseApp) + ']'
-        appFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_app.json"
+        appFilePath =  gitFilePath + "_app.json"
         repo.create_file(appFilePath, commitMessage, responseApp, branch="main")
 
         # Create Collection file
         collectionData = json.dumps(collectionData)
-        collectionFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_collections.json"
+        collectionFilePath = gitFilePath + "_collections.json"
         repo.create_file(collectionFilePath, commitMessage, collectionData, branch="main")
 
         # Create Form Template file
         form_templates = json.dumps(form_templates)
-        formtempateFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_form_template.json"
+        formtempateFilePath = gitFilePath + "_form_template.json"
         repo.create_file(formtempateFilePath, commitMessage, form_templates, branch="main")
 
         # Create Action Flow file
         action_flows = json.dumps(action_flows)
-        actionflowFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_action_flows.json"
+        actionflowFilePath = gitFilePath + "_action_flows.json"
         repo.create_file(actionflowFilePath, commitMessage, action_flows, branch="main")
 
         # Create Import entry file
         import_entries = json.dumps(import_entries)
-        importentryFilePath = domain_name + "/" + app + "/" + version +"/"+ timestamp + "_import_entry.json"
+        importentryFilePath = gitFilePath + "_import_entry.json"
         repo.create_file(importentryFilePath, commitMessage, import_entries, branch="main")
 
         # Create Config file
         configData = json.dumps(configData)
         configFilePath = domain_name + "/" + app + "/" + version +"/_config.json"
         repo.create_file(configFilePath, commitMessage, configData, branch="main")
-        
+
         # Dumping data when password is entered
         if dataexport == True:
             dataset_response = requests.put(settings.baseURL + 'api/transfer/' + app +'/data', json={
