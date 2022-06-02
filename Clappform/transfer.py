@@ -162,14 +162,15 @@ class Transfer:
                             for action in module["selection"]["actions"]:
                                 if action["type"] == "actionflow":
                                     action_flow_id = action["actionflowId"]
+                                    # Curl request to get data of all related action flows
                                     response = requests.get(settings.baseURL + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
                                     action_flows.append(response.json()["data"])
                                 elif action["type"] == "questionnaire":
                                     print("export form templates")
-                                    # form_id = action["formtemplateId"]
-                                    # # Curl request to get data of all form templates
-                                    # response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
-                                    # form_templates.append(response.json()["data"])
+                                    form_id = action["template"]["id"]
+                                    # Curl request to get data of all related form templates
+                                    response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
+                                    form_templates.append(response.json()["data"])
 
         # Get import_entry data used by app
         import_entries = []
