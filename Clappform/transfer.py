@@ -10,6 +10,7 @@ import base64
 # from simplecrypt import encrypt, decrypt
 import os
 import pandas as pd
+import re
 
 class Transfer:
     id = None
@@ -190,8 +191,12 @@ class Transfer:
         today = date.today()
         version = today.strftime("%y%m%d") # yymmdd
 
-        domain_name = settings.baseURL[8:-1]
+        domain_name = settings.baseURL
+        re.sub("^https?:\/\/","", domain_name)
 
+        if domain_name == "web_server":
+            domain_name = "localhost"
+        print(domain_name)
         # Check if app with version already exists, if it does, append number
         versionInUse = True
         additional = 1
@@ -223,10 +228,6 @@ class Transfer:
         timestamp_int = int(t)
         timestamp = str(timestamp_int)
         commitMessage = app + " - " + version + " published"
-
-
-        if domain_name == "eb_server":
-            domain_name = "localhost"
 
         configData = {
             "timestamp": timestamp_int,
