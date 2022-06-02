@@ -191,8 +191,9 @@ class Transfer:
         today = date.today()
         version = today.strftime("%y%m%d") # yymmdd
 
-        domain_name = settings.baseURL
-        domain_name = re.sub("^https?:\/\/","", domain_name)
+        domain_name = re.sub("^https?:\/\/","", settings.baseURL)
+        domain_name = domain_name.rstrip('\/')
+
         if domain_name == "web_server":
             domain_name = "localhost"
         print(domain_name)
