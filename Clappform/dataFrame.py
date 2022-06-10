@@ -445,7 +445,7 @@ class _DataFrame:
         for i in dates:
             for k in date_dict.keys():
                 dataframe[i] = dataframe[i].apply(
-                    lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
+                    lambda x: time.mktime(datetime.strptime(x[:19], date_dict[k]).timetuple()) if type(x) == str and (
                         re.match(k, x, flags=re.IGNORECASE)) else x)
 
         if show == True:
