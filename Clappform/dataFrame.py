@@ -378,15 +378,9 @@ class _DataFrame:
 
             except IndexError as error:
                 return 'the column {0} contains no letter, underscore or dollar sign'.format(l)
-        try:
-            dup_columns = dataframe.columns[dataframe.columns.duplicated()]
-            if not dup_columns.any():
-                pass
-            else:
-                raise TypeError
-        except TypeError as error:
-            dup_columns = list(set(dup_columns))
-            return 'There are multiple column(s) %s' % dup_columns
+
+        # Remove duplicate keys
+        dataframe = dataframe.loc[:,~dataframe.columns.duplicated()].copy()
 
         monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
         shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
