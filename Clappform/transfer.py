@@ -164,14 +164,13 @@ class Transfer:
                                 type_present = "type" in action
                                 if(type_present):
                                     if action["type"] == "actionflow":
-                                        action_flow_id = action["actionflowId"]
                                         # Curl request to get data of all related action flows
+                                        action_flow_id = action["actionflowId"]["id"]
                                         response = requests.get(settings.baseURL + 'api/actionflow/' + str(action_flow_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
                                         action_flows.append(response.json()["data"])
                                     elif action["type"] == "questionnaire":
-                                        print("export form templates")
-                                        form_id = action["template"]["id"]
                                         # Curl request to get data of all related form templates
+                                        form_id = action["template"]["id"]
                                         response = requests.get(settings.baseURL + 'api/form_template/' + str(form_id) + '?extended=true', headers={'Authorization': 'Bearer ' + settings.token})
                                         form_templates.append(response.json()["data"])
 
