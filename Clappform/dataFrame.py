@@ -306,7 +306,7 @@ class _DataFrame:
         else:
             raise Exception(response.json()["message"])
 
-    def Append(self, dataframe, n_jobs = 1, show = False):
+    def Append(self, dataframe, n_jobs = 1, show = False, delete_dup_columns = False):
         if not Auth.tokenValid():
             Auth.refreshToken()
         df = dataframe.copy()
@@ -378,9 +378,17 @@ class _DataFrame:
 
             except IndexError as error:
                 return 'the column {0} contains no letter, underscore or dollar sign'.format(l)
-
-        # Remove duplicate keys
-        dataframe = dataframe.loc[:,~dataframe.columns.duplicated()].copy()
+        try:
+            dup_columns = dataframe.columns[dataframe.columns.duplicated()]
+            if not dup_columns.any():
+                pass
+            elif delete_dup_columns is True:
+                dataframe = dataframe.loc[:,~dataframe.columns.duplicated()].copy()
+            else:
+                raise TypeError
+        except TypeError as error:
+            dup_columns = list(set(dup_columns))
+            return 'There are multiple column(s) %s' % dup_columns
 
         monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
         shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
