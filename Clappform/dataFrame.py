@@ -397,10 +397,12 @@ class _DataFrame:
         month = r'((1[0-2]){1}|(0?[1-9]){1}){1}'
         year = r'([12]{1}[0-9]{3}){1}'
         hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
+        hmsz = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}(+[0-9]{1}[0-9]{1}){2}(:[0-9]{1}[0-9]{1}){2}'
 
         date_dict = {
             r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
             r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
+            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hmsz + r')\b': '%Y-%m-%d %H:%M:%S%z',
             r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
             r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
             r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
@@ -442,14 +444,9 @@ class _DataFrame:
 
         for i in dates:
             for k in date_dict.keys():
-                try:
-                    dataframe[i] = dataframe[i].apply(
-                        lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
-                            re.match(k, x, flags=re.IGNORECASE)) else x)
-                except:
-                    dataframe[i] = dataframe[i].apply(
-                        lambda x: time.mktime(datetime.strptime(x, '%Y-%m-%d %H:%M:%S%z').timetuple()) if type(x) == str and (
-                            re.match(k, x, flags=re.IGNORECASE)) else x)
+                dataframe[i] = dataframe[i].apply(
+                    lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
+                        re.match(k, x, flags=re.IGNORECASE)) else x)
 
         if show == True:
             for index, (first, second) in enumerate(zip(df.columns, dataframe.columns)):
