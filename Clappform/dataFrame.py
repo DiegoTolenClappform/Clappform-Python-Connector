@@ -442,9 +442,14 @@ class _DataFrame:
 
         for i in dates:
             for k in date_dict.keys():
-                dataframe[i] = dataframe[i].apply(
-                    lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
-                        re.match(k, x, flags=re.IGNORECASE)) else x)
+                try:
+                    dataframe[i] = dataframe[i].apply(
+                        lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
+                            re.match(k, x, flags=re.IGNORECASE)) else x)
+                except:
+                    dataframe[i] = dataframe[i].apply(
+                        lambda x: time.mktime(datetime.strptime(x, '%Y-%m-%d %H:%M:%S%z').timetuple()) if type(x) == str and (
+                            re.match(k, x, flags=re.IGNORECASE)) else x)
 
         if show == True:
             for index, (first, second) in enumerate(zip(df.columns, dataframe.columns)):
