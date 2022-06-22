@@ -6,29 +6,28 @@ import requests
 import math
 import pandas as pd
 
+
 class _Collection:
     app_id = None
     id = None
 
-    def __init__(self, app, collection = None):
+    def __init__(self, app, collection=None):
         self.app_id = app
         self.id = collection
 
-    
     def DataFrame(self):
         return _DataFrame(self.app_id, self.id)
 
-
-    def Item(self, item = None):
+    def Item(self, item=None):
         return _Item(self.app_id, self.id, item)
 
-
-    def ReadOne(self, extended = False, original = True):
+    def ReadOne(self, extended=False, original=True):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         extended = str(extended).lower()
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '?extended=' + extended + '&original=' + str(original).lower(), headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id + '?extended=' +
+                                extended + '&original=' + str(original).lower(), headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] is not 200:
             raise Exception(response.json()["message"])
@@ -51,15 +50,14 @@ class _Collection:
 
                     for item in response.json()["data"]["items"]:
                         data.append(item["data"])
-                
+
                 currentLoop += 1
 
             result["data"] = data
-        
-        return result
-        
 
-    def Create(self, slug, name, description, encryption, logging, sources = []):
+        return result
+
+    def Create(self, slug, name, description, encryption, logging, sources=[]):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -79,8 +77,7 @@ class _Collection:
         else:
             raise Exception(response.json()["message"])
 
-
-    def Update(self, slug = None, name = None, description = None, encryption = None, logging = None, sources = None):
+    def Update(self, slug=None, name=None, description=None, encryption=None, logging=None, sources=None):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -112,8 +109,7 @@ class _Collection:
         else:
             raise Exception(response.json()["message"])
 
-
-    def Delete(self, slug = None, app = None, delete = None):
+    def Delete(self, slug=None, app=None, delete=None):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -127,7 +123,8 @@ class _Collection:
         if delete is not None:
             properties["delete_modules"] = True
 
-        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.id, json=properties, headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id + '/' +
+                                   self.id, json=properties, headers={'Authorization': 'Bearer ' + settings.token})
 
         if response.json()["code"] is 200:
             if "data" in response.json():
@@ -136,24 +133,23 @@ class _Collection:
         else:
             raise Exception(response.json()["message"])
 
-
-    def Empty(self):
+    def Empty(self, data_lake=False):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id  + '/' + self.id + '/dataframe', headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.delete(f'{settings.baseURL}api/metric{self.app_id}/{self.id}/dataframe?data_lake={data_lake}',
+                                   headers={'Authorization': f'Bearer {settings.token}'})
 
         if response.json()["code"] is 200:
             return True
         else:
             raise Exception(response.json()["message"])
 
-    
     def Lock(self):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={ "locked": True }, headers={
+        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={"locked": True}, headers={
             'Authorization': 'Bearer ' + settings.token
         })
 
@@ -161,13 +157,12 @@ class _Collection:
             return True
         else:
             raise Exception(response.json()["message"])
-
 
     def Unlock(self):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={ "locked": False }, headers={
+        response = requests.put(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.id, json={"locked": False}, headers={
             'Authorization': 'Bearer ' + settings.token
         })
 
@@ -176,8 +171,7 @@ class _Collection:
         else:
             raise Exception(response.json()["message"])
 
-
-    def Query(self, filters = {}, projection = {}, sorting = {}, original = True):
+    def Query(self, filters={}, projection={}, sorting={}, original=True):
         if not Auth.tokenValid():
             Auth.refreshToken()
 

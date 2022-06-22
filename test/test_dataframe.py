@@ -8,6 +8,7 @@ from .settings import settings
 from Clappform.collection import _Collection
 from Clappform.app import App
 
+
 class TestDataFrame(unittest.TestCase):
     global_dataframe_data = ""
 
@@ -40,7 +41,7 @@ class TestDataFrame(unittest.TestCase):
 
     def test_aread(self):
         print("=====[ Reading collection and creating dataframe ]=====")
-        for result in App("clappform_logs").Collection("api_logs").DataFrame().Read(original=True, n_jobs = 1):
+        for result in App("clappform_logs").Collection("api_logs").DataFrame().Read(original=True, n_jobs=1):
             if result is not None:
                 TestDataFrame.global_dataframe_data = result
         print(TestDataFrame.global_dataframe_data)
@@ -56,7 +57,7 @@ class TestDataFrame(unittest.TestCase):
 
     def test_cappend(self):
         print("=====[ Appending collection and dataframe ]=====")
-        resp = App("default").Collection(self.collection_id).DataFrame().Append(dataframe=TestDataFrame.global_dataframe_data, n_jobs = 1, show = False)
+        resp = App("default").Collection(self.collection_id).DataFrame().Append(dataframe=TestDataFrame.global_dataframe_data, n_jobs=1, show=False)
         assert resp is True
         print("=====[ Done appending collection and dataframe ]=====")
 
@@ -67,9 +68,30 @@ class TestDataFrame(unittest.TestCase):
         assert self.dataframe_data is not None
         print("=====[ Done querying collection and dataframe ]=====")
 
-    def test_zdeleteOne(self): # Reason for the Z is so update goes first. unittesting works on alphabet
+    def test_zdeleteOne(self):  # Reason for the Z is so update goes first. unittesting works on alphabet
         print("=====[ Deleting one collection in enviroment ]=====")
         self.deleted_collection = App("default").Collection(self.collection_id).Delete()
         print(self.deleted_collection)
         assert self.deleted_collection is not None
         print("=====[ Done deleting one collection in enviroment ]=====")
+
+    # Data lake tests
+    def test_bsyncDataLake(self):
+        print("=====[ Syncing collection and dataframe on data lake ]=====")
+        App("default").Collection().Create(slug=self.collection_id, name=self.collection_desc, description=self.collection_desc, encryption=self.collection_encryption, logging=self.collection_logging, sources=self.collection_sources)
+        resp = App("default").Collection(self.collection_id).DataFrame().Synchronize(dataframe=TestDataFrame.global_dataframe_data, n_jobs=0, data_lake=True)
+        assert resp is True
+        print("=====[ Done Syncing collection and dataframe on data lake ]=====")
+
+    def test_cappendDataLake(self):
+        print("=====[ Appending collection and dataframe on data lake ]=====")
+        resp = App("default").Collection(self.collection_id).DataFrame().Append(dataframe=TestDataFrame.global_dataframe_data, n_jobs=1, show=False, data_lake=True)
+        assert resp is True
+        print("=====[ Done appending collection and dataframe on data lake ]=====")
+
+    def test_zdeleteOneDataLake(self):  # Reason for the Z is so update goes first. unittesting works on alphabet
+        print("=====[ Deleting one collection in enviroment on data lake ]=====")
+        self.deleted_collection = App("default").Collection(self.collection_id).Delete(data_lake=True)
+        print(self.deleted_collection)
+        assert self.deleted_collection is not None
+        print("=====[ Done deleting one collection in enviroment on data lake ]=====")

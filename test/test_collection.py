@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.app import App
 
+
 class TestCollection(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -34,7 +35,8 @@ class TestCollection(unittest.TestCase):
 
     def test_createOne(self):
         print("=====[ Creating one collection in enviroment ]=====")
-        self.created_collection = App("default").Collection().Create(slug=self.collection_id, name=self.collection_desc, description=self.collection_desc, encryption=self.collection_encryption, logging=self.collection_logging, sources=self.collection_sources)
+        self.created_collection = App("default").Collection().Create(slug=self.collection_id, name=self.collection_desc, description=self.collection_desc,
+                                                                     encryption=self.collection_encryption, logging=self.collection_logging, sources=self.collection_sources)
         print(self.created_collection)
         assert self.created_collection is not None
         print("=====[ Done creating one collection in enviroment ]=====")
@@ -46,7 +48,7 @@ class TestCollection(unittest.TestCase):
         assert self.updated_collection is not None
         print("=====[ Done updating one collection in enviroment ]=====")
 
-    def test_zdeleteOne(self): # Reason for the Z is so update goes first. unittesting works on alphabet
+    def test_zdeleteOne(self):  # Reason for the Z is so update goes first. unittesting works on alphabet
         print("=====[ Deleting one collection in enviroment ]=====")
         self.deleted_collection = App("default").Collection(self.collection_id).Delete()
         print(self.deleted_collection)
@@ -87,3 +89,11 @@ class TestCollection(unittest.TestCase):
         print(test)
         assert test is not None
         print("=====[ Done getting dataframe of one collection in enviroment ]=====")
+
+    # Data lake tests
+    def test_emptyDataLake(self):
+        print("=====[ Emptying one collection in enviroment on data lake ]=====")
+        test = App("default").Collection(self.collection_id).Empty()
+        print(test)
+        assert test is not None
+        print("=====[ Done emptying one collection in enviroment on data lake ]=====")

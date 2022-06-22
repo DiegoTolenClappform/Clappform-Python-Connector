@@ -22,7 +22,7 @@ class _DataFrame:
         self.app_id = app
         self.collection_id = collection
 
-    def Read(self, original=True, itemsPerRun=500, n_jobs = 1):
+    def Read(self, original=True, itemsPerRun=500, n_jobs=1):
         self.data = []
         if not Auth.tokenValid():
             Auth.refreshToken()
@@ -40,12 +40,13 @@ class _DataFrame:
 
             res_data = []
             try:
-                fullUrl = settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str( i * itemsPerRun ) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower()
+                fullUrl = settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + \
+                    str(i * itemsPerRun) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower()
                 response = requests.get(
                     fullUrl,
                     headers={
                         'Authorization': 'Bearer ' + settings.token
-                })
+                    })
                 for item in response.json()["data"]["items"]:
                     res_data.append(item["data"])
 
@@ -55,7 +56,6 @@ class _DataFrame:
             except requests.exceptions.RequestException as exception:
                 resp = exception.response
                 print(resp.status_code)
-
 
         # def Worker(self, i, itemsPerRun, original):
         #     if not Auth.tokenValid():
@@ -101,12 +101,12 @@ class _DataFrame:
 
         # return pd.DataFrame(self.data)
 
-    def Synchronize(self, dataframe, n_jobs=1):
+    def Synchronize(self, dataframe, n_jobs=1, data_lake=False):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
-                                   headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.delete(f'{settings.baseURL}api/metric/{self.app_id}/{self.collection_id}/dataframe?data_lake={data_lake}',
+                                   headers={'Authorization': f'Bearer {settings.token}'})
 
         if response.json()["code"] == 200:
             df = dataframe.copy()
@@ -239,8 +239,8 @@ class _DataFrame:
                     print(first, 'has been changed to', second)
 
             dataframe.reset_index(inplace=True, drop=True)
-            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id, headers={
-                'Authorization': 'Bearer ' + settings.token
+            response = requests.get(f'{settings.baseURL}api/metric/{self.app_id}/{self.collection_id}?data_lake={data_lake}', headers={
+                'Authorization': f'Bearer {settings.token}'
             })
 
             if 'index' in dataframe:
@@ -258,9 +258,9 @@ class _DataFrame:
                     items = json.loads(portion.to_json(orient='index'))
 
                     response = requests.post(
-                        settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
+                        f'{settings.baseURL}api/metric/{self.app_id}/{self.collection_id}/dataframe?data_lake={data_lake}',
                         json=items, headers={
-                            'Authorization': 'Bearer ' + settings.token
+                            'Authorization': f'Bearer {settings.token}'
                         })
                 elif len(dataframe.index) + offset == x + 1:
                     portion = dataframe.tail(
@@ -271,9 +271,9 @@ class _DataFrame:
                     portion.index += offset + count + (amountSent + 1)
                     items = json.loads(portion.to_json(orient='index'))
                     response = requests.post(
-                        settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
+                        f'{settings.baseURL}api/metric/{self.app_id}/{self.collection_id}/dataframe?data_lake={data_lake}',
                         json=items, headers={
-                            'Authorization': 'Bearer ' + settings.token
+                            'Authorization': f'Bearer {settings.token}'
                         })
 
                 count += 1
@@ -306,7 +306,7 @@ class _DataFrame:
         else:
             raise Exception(response.json()["message"])
 
-    def Append(self, dataframe, n_jobs = 1, show = False):
+    def Append(self, dataframe, n_jobs=1, show=False, data_lake=False):
         if not Auth.tokenValid():
             Auth.refreshToken()
         df = dataframe.copy()
@@ -351,7 +351,8 @@ class _DataFrame:
         # Removes all spaces at the start and end
         dataframe.columns = dataframe.columns.str.strip()
 
-        exceptions = {'ü': 'u', 'ä': 'a', 'ö': 'o', 'ë': 'e', 'ï': 'i', '%': '_procent_', '&': '_and_', ' ': '_', '-': '_'}
+        exceptions = {'ü': 'u', 'ä': 'a', 'ö': 'o', 'ë': 'e', 'ï': 'i',
+                      '%': '_procent_', '&': '_and_', ' ': '_', '-': '_'}
 
         for v, k in exceptions.items():
             dataframe.columns = dataframe.columns.str.replace(v, k)
@@ -364,7 +365,6 @@ class _DataFrame:
         # trimms all values
         dataframe = dataframe.applymap(lambda x: x.strip() if type(x) == str else x)
         dataframe = dataframe.applymap(lambda x: ' '.join(x.split()) if type(x) == str else x)
-
 
         for i in dataframe:
             l = i
@@ -450,8 +450,8 @@ class _DataFrame:
                     print(first, 'has been changed to', second)
 
         dataframe.reset_index(inplace=True, drop=True)
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id, headers={
-            'Authorization': 'Bearer ' + settings.token
+        response = requests.get(f'{settings.baseURL}api/metric/{self.app_id}/{self.collection_id}?data_lake={data_lake}', headers={
+            'Authorization': f'Bearer {settings.token}'
         })
 
         if 'index' in dataframe:
@@ -469,9 +469,9 @@ class _DataFrame:
                 portion.index += offset - 99
                 items = json.loads(portion.to_json(orient='index'))
                 response = requests.post(
-                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
+                    f'{settings.baseURL}api/metric/{self.app_id}/{self.collection_id}/dataframe?data_lake={data_lake}',
                     json=items, headers={
-                        'Authorization': 'Bearer ' + settings.token
+                        'Authorization': f'Bearer {settings.token}'
                     })
 
             elif x + amountSent >= len(dataframe.index):
@@ -595,7 +595,7 @@ class _DataFrame:
 
         return pd.DataFrame(data)
 
-    def DeleteItems(self, ItemIDArray=[]):
+    def DeleteItems(self, ItemIDArray=[], data_lake=False):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -607,13 +607,13 @@ class _DataFrame:
 
             itemIDString = json.dumps(x)
 
-            response = requests.delete(settings.baseURL + "api/item/" + self.app_id + "/" + self.collection_id +"/dataframe",
-                        json={
-                            "content": itemIDString
-                        },
-                        headers={
-                            'Authorization': 'Bearer ' + settings.token
-                        })
+            response = requests.delete(f'{settings.baseURL}api/metric/{self.app_id}/{self.collection_id}/dataframe?data_lake={data_lake}',
+                                       json={
+                                           "content": itemIDString
+                                       },
+                                       headers={
+                                           'Authorization': f'Bearer {settings.token}'
+                                       })
         else:
             raise Exception('No IDs to delete')
 
