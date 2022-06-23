@@ -9,6 +9,7 @@ from .email import Email
 from .file import File
 from .user import User
 from .actionflow import Actionflow
+from .datalake import DataLake
 
 settings
 settings.token = ""

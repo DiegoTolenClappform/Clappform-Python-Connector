@@ -3,11 +3,10 @@ from .dataFrame import _DataFrame
 from .item import _Item
 from .auth import Auth
 import requests
-import math
 import pandas as pd
 
 
-class _DataLake:
+class DataLake:
     app_id = None
     collection_id = None
 
