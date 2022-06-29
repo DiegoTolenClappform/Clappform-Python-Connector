@@ -599,7 +599,7 @@ class _DataFrame:
 
         return pd.DataFrame(data)
 
-    def DeleteItems(self, ItemIDArray=[]):
+    def DeleteItems(self, uniqueKey="id", ItemIDArray=[]):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -613,7 +613,8 @@ class _DataFrame:
 
             response = requests.delete(settings.baseURL + "api/item/" + self.app_id + "/" + self.collection_id +"/dataframe/",
                         json={
-                            "content": itemIDString
+                            "content": itemIDString,
+                            "key": uniqueKey
                         },
                         headers={
                             'Authorization': 'Bearer ' + settings.token
