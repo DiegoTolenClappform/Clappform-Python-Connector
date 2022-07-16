@@ -22,37 +22,6 @@ class _DataFrame:
         self.app_id = app
         self.collection_id = collection
 
-    def Query(self, payload = {}):
-        self.data = []
-        if not Auth.tokenValid():
-            Auth.refreshToken()
-
-        response_total = requests.request("POST", settings.baseURL + 'api/read_data?total_count=true', headers={
-            'Authorization': 'Bearer ' + settings.token
-        }, data=payload)
-        if response_total.json()['code'] == 200:
-            for i in range(0, math.ceil(response_total.json()['data'][0]['total_results'] / 500)):
-                if not Auth.tokenValid():
-                    Auth.refreshToken()
-                response = ""
-
-                res_data = []
-                try:
-                    response = requests.get(
-                        settings.baseURL + 'api/read_data?total_count=false',
-                        headers={
-                            'Authorization': 'Bearer ' + settings.token
-                    })
-                    for item in response.json()["data"]:
-                        res_data.append(item["data"])
-
-                    # Sleep for elapsed time to not get marked as DDOS
-                    time.sleep(response.elapsed.total_seconds())
-                    yield pd.DataFrame(res_data)
-                except requests.exceptions.RequestException as exception:
-                    resp = exception.response
-                    print(resp.status_code)
-
     def Read(self, original=True, itemsPerRun=500, n_jobs = 1):
         self.data = []
         if not Auth.tokenValid():
