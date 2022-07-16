@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import math
 import time
+import json
 from .auth import Auth
 
 class Query:
@@ -16,6 +17,8 @@ class Query:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
+        body = json.dumps(body, indent=2)
+
         response_total = requests.request("POST", settings.baseURL + 'api/read_data?total_count=true', headers={
             'Authorization': 'Bearer ' + settings.token
         }, data=body)
@@ -27,13 +30,11 @@ class Query:
 
                 res_data = []
                 try:
-                    response = requests.get(
-                        settings.baseURL + 'api/read_data?total_count=false',
-                        headers={
-                            'Authorization': 'Bearer ' + settings.token
-                    })
+                    response = requests.request("POST", settings.baseURL + 'api/read_data?total_count=false', headers={
+                        'Authorization': 'Bearer ' + settings.token
+                    }, data=body)
                     for item in response.json()["data"]:
-                        res_data.append(item["data"])
+                        res_data.append(item)
 
                     # Sleep for elapsed time to not get marked as DDOS
                     time.sleep(response.elapsed.total_seconds())
