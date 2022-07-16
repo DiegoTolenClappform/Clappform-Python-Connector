@@ -6,12 +6,10 @@ import time
 from .auth import Auth
 
 class Query:
-    app_id = None
-    collection_id = None
+    id = None
 
-    def __init__(self, app, collection):
-        self.app_id = app
-        self.collection_id = collection
+    def __init__(self, query = None):
+        self.id = query
 
     def ReadData(self, body = {}):
         self.data = []
