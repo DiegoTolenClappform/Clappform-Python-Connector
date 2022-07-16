@@ -9,6 +9,8 @@ from .email import Email
 from .file import File
 from .user import User
 from .actionflow import Actionflow
+from .query import Query
+
 
 settings
 settings.token = ""
