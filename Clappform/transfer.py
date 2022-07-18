@@ -18,7 +18,7 @@ class Transfer:
     def __init__(self, transfer = None):
         self.id = transfer
 
-    def CreateApp(enviroment="", app="", version="", gitAccessToken = "", dataexport=False):
+    def RestoreApp(enviroment="", app="", version="", gitAccessToken = "", dataexport=False):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
