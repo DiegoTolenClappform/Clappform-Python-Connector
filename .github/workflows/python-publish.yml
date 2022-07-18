@@ -4,6 +4,9 @@ on:
   push:
     branches: [ Master ]
 
+  release:
+    types: [created]
+
 jobs:
   deploy:
 
