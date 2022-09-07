@@ -118,7 +118,8 @@ class Transfer:
             "collections": json.dumps(collection_json, separators=(',', ':')),
             "form_templates": json.dumps(formtemplate_json, separators=(',', ':')),
             "action_flows": json.dumps(actionflow_json, separators=(',', ':')),
-            "import_entry": json.dumps(import_json, separators=(',', ':'))
+            "import_entry": json.dumps(import_json, separators=(',', ':')),
+            "delete_mongo_data": dataexport
         },headers={
             'Authorization': 'Bearer ' + settings.token
         })

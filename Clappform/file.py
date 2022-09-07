@@ -4,8 +4,11 @@ import os
 import time
 import numpy as np
 import pandas as pd
+import requests
+import base64
 import pyarrow as pa
 import pyarrow.parquet as pq
+from pandas import json_normalize
 
 class File:
     id = None
@@ -84,4 +87,59 @@ class File:
 
         return writer
 
+    def UploadDataFrameToAzure(srcdata, filename, exportType = "excel", AzureFileShare = "AZURE", AzureFolderPath = ["file_upload", "clapp_pypi"]):
+        """
+        Options for exportType: json, excel & csv.
+        Options for AzureFileShare: AZURE, PDF_AZURE, SFTP_AZURE & GENERAL_PDF.
+        [{
+            "srcdata": "pandas dataframe",
+            "filename": "Export_file",
+            "AzureFileShare": "SFTP_AZURE",
+            "AzureFolderPath": ["upload"],
+            "exportType": "excel, json or csv",
+        }]
+        """
 
+        ## Convert dataframe data ##
+        print("Converting DataFrame to ", exportType)
+        if exportType == 'excel':
+            filename = filename + '.xlsx'
+
+            # To Excel to base 64
+            srcdata.to_excel(filename)
+            with open(filename, "rb") as excel_file:
+                base_64_data = base64.b64encode(excel_file.read())
+
+        elif exportType == 'csv':
+            filename = filename + '.csv'
+
+            # To CSV to base 64
+            srcdata.to_csv(filename)
+            with open(filename, "rb") as csv_file:
+                base_64_data = base64.b64encode(csv_file.read())
+
+        elif exportType == 'json':
+            filename = filename + '.json'
+
+            # To JSON to base 64
+            json_df = srcdata.to_json(orient="records")
+            base_64_data = base64.b64encode(bytes(json_df, "utf-8"))
+
+        json_request = {
+            "location": AzureFileShare,
+            "folder_path": AzureFolderPath,
+            "file_name": filename
+        }
+        json_request['content'] = base_64_data.decode("utf-8")
+
+        ## Check token validity ##
+        if not Auth.tokenValid():
+            Auth.refreshToken()
+
+        ## Upload using API File routing ##
+        response = requests.post(settings.baseURL + "api/file", json=json_request,
+        headers={"Authorization": settings.token })
+
+        final_file_name = response.json()["data"]["file_name"]
+        print(final_file_name)
+        return final_file_name
