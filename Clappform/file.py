@@ -139,7 +139,7 @@ class File:
         ## Upload using API File routing ##
         response = requests.post(settings.baseURL + "api/file", json=json_request,
         headers={"Authorization": settings.token })
-
+        print(response)
         final_file_name = response.json()["data"]["file_name"]
         print(final_file_name)
         return final_file_name
