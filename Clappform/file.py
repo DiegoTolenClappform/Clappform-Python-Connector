@@ -140,6 +140,7 @@ class File:
         response = requests.post(settings.baseURL + "api/file", json=json_request,
         headers={"Authorization": settings.token })
         print(response)
-        final_file_name = response.json()["data"]["file_name"]
-        print(final_file_name)
-        return final_file_name
+        # final_file_name = response.json()["data"]["file_name"]
+        # print(final_file_name)
+        # return final_file_name
+        return "Done"
