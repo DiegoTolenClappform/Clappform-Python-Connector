@@ -88,6 +88,9 @@ class File:
         return writer
 
     def UploadDataFrameToAzure(srcdata, filename, exportType = "excel", AzureFileShare = "AZURE", AzureFolderPath = ["file_upload", "clapp_pypi"]):
+        ## Check token validity ##
+        if not Auth.tokenValid():
+            Auth.refreshToken()
         """
         Options for exportType: json, excel & csv.
         Options for AzureFileShare: AZURE, PDF_AZURE, SFTP_AZURE & GENERAL_PDF.
@@ -132,14 +135,9 @@ class File:
         }
         json_request['content'] = base_64_data.decode("utf-8")
 
-        ## Check token validity ##
-        if not Auth.tokenValid():
-            Auth.refreshToken()
-
         ## Upload using API File routing ##
         response = requests.post(settings.baseURL + "api/file", json=json_request,
-        headers={"Authorization": settings.token })
+        headers={"Authorization": 'Bearer ' + settings.token })
 
         final_file_name = response.json()["data"]["file_name"]
-        print(final_file_name)
         return final_file_name
