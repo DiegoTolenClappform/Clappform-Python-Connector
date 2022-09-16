@@ -10,7 +10,12 @@ from .file import File
 from .user import User
 from .actionflow import Actionflow
 from .query import Query
+from .worker import Worker
 
 
 settings
 settings.token = ""
+__version__ = "1.10.0"
+__author__ = "Clappform"
+__email__ = "info@clappform.com"
+__license__ = "MIT"

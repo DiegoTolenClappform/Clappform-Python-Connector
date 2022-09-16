@@ -324,6 +324,37 @@ The Create() function returns an instance of the Whatsapp class containing the c
 Clappform.Whatsapp.Create(user='test@clappform.com', content='Data has been updated')
 ```
 
+## Worker
+### from_getenv
+The `from_getenv()` funtion returns an instance of the Worker class. With this instance one can interact with the Worker cache for a specific actionflow. The `Get(key)`, `Set(key)` and `Keys()` methods are described in further detail in the sections below. By default `from_getenv()` loads its configuration from the `WORKER_TASK_OPTIONS` environment variable, this can be changed setting the `var` keyword argument e.g. `from_getenv(var="EXAMPLE")`. The value of the environment variable must be a JSON string with the following keys: env, action_flow, userid, redis_uri.
+
+The Worker always sets the `WORKER_TASK_OPTIONS` environment variable when executing tasks. When using the `Worker` class one can create an instance as follow:
+
+```python
+w = Clappform.Worker.from_getenv()
+```
+
+### Get
+`Get(key)` Is a method that retrieves the value for that given key. `key` Must be of type `str`. The return value is based on the input given to the `Set()` method.
+```python
+>>> w.Get("key1")
+b'I like turtles!'
+```
+
+### Set
+The `Set(key, value)` allows for storing key value pairs inside the cache. `key` Must be of type `str` and value must be one of: `bytes`, `memoryview`, `str`, `int` or `float`.
+```python
+>>> w.Set("key1", "I like turtles!")
+```
+
+### Keys
+With `keys()` you get a list of known keys.
+```
+>>> w.Keys()
+[b'https://example.clappform.com_1_1_spam', b'https://example.clappform.com_1_1_eggs', b'https://example.clappform.com_1_1_foo']
+```
+
+
 ## Settings
 The settings class is used as module-wide storage for the module. It holds the current token and the base URL.
 
