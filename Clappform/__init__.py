@@ -14,7 +14,7 @@ from .query import Query
 
 settings
 settings.token = ""
-__version__ = "1.9.861.dev0"
+__version__ = "1.10.0.dev0"
 __author__ = "Clappform"
 __email__ = "info@clappform.com"
 __license__ = "MIT"
