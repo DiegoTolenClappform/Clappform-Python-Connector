@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.email import Email
 
+
 class TestMail(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -37,23 +38,27 @@ class TestMail(unittest.TestCase):
 
     def test_create(self):
         templatejson = {
-            "BODY" : self.content,
-            "SENDER" : self.sender,
+            "BODY": self.content,
+            "SENDER": self.sender,
             "TO": self.recipientname,
-            "SUBJECT": self.mailsubject
+            "SUBJECT": self.mailsubject,
         }
 
-        tojson = {
-            "name": self.recipientname, 
-            "email": self.recipientmail
-        }
+        tojson = {"name": self.recipientname, "email": self.recipientmail}
 
         fromjson = {
-            "name": "Automatic testing pypi package", 
-            "email": "info@clappform.com"
+            "name": "Automatic testing pypi package",
+            "email": "info@clappform.com",
         }
         print("=====[ Sending email ]=====")
-        self.assertEqual(Email.Create(templateid=self.template_id, tojson=tojson, templatejson=templatejson, fromjson=fromjson), "Mail is send", "Should be correct message")
+        self.assertEqual(
+            Email.Create(
+                templateid=self.template_id,
+                tojson=tojson,
+                templatejson=templatejson,
+                fromjson=fromjson,
+            ),
+            "Mail is send",
+            "Should be correct message",
+        )
         print("=====[ Done sending email ]=====")
-
-

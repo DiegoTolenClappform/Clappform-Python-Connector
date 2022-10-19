@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.auth import Auth as Auth
 
+
 class TestAuth(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -26,4 +27,3 @@ class TestAuth(unittest.TestCase):
         print(rep)
         assert rep is not None
         print("=====[ Done testing login ]=====")
-

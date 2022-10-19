@@ -22,30 +22,46 @@ class _DataFrame:
         self.app_id = app
         self.collection_id = collection
 
-    def Read(self, original=True, itemsPerRun=500, n_jobs = 1):
+    def Read(self, original=True, itemsPerRun=500, n_jobs=1):
         self.data = []
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         response_total = requests.get(
-            settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=false',
-            headers={
-                'Authorization': 'Bearer ' + settings.token
-            })
+            settings.baseURL
+            + "api/metric/"
+            + self.app_id
+            + "/"
+            + self.collection_id
+            + "?extended=false",
+            headers={"Authorization": "Bearer " + settings.token},
+        )
 
-        for i in range(0, math.ceil(response_total.json()["data"]["items"] / itemsPerRun)):
+        for i in range(
+            0, math.ceil(response_total.json()["data"]["items"] / itemsPerRun)
+        ):
             if not Auth.tokenValid():
                 Auth.refreshToken()
             response = ""
 
             res_data = []
             try:
-                fullUrl = settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '?extended=true&offset=' + str( i * itemsPerRun ) + '&limit=' + str(itemsPerRun) + '&original=' + str(original).lower()
+                fullUrl = (
+                    settings.baseURL
+                    + "api/metric/"
+                    + self.app_id
+                    + "/"
+                    + self.collection_id
+                    + "?extended=true&offset="
+                    + str(i * itemsPerRun)
+                    + "&limit="
+                    + str(itemsPerRun)
+                    + "&original="
+                    + str(original).lower()
+                )
                 response = requests.get(
-                    fullUrl,
-                    headers={
-                        'Authorization': 'Bearer ' + settings.token
-                })
+                    fullUrl, headers={"Authorization": "Bearer " + settings.token}
+                )
                 for item in response.json()["data"]["items"]:
                     res_data.append(item["data"])
 
@@ -55,7 +71,6 @@ class _DataFrame:
             except requests.exceptions.RequestException as exception:
                 resp = exception.response
                 print(resp.status_code)
-
 
         # def Worker(self, i, itemsPerRun, original):
         #     if not Auth.tokenValid():
@@ -105,8 +120,15 @@ class _DataFrame:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        response = requests.delete(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
-                                   headers={'Authorization': 'Bearer ' + settings.token})
+        response = requests.delete(
+            settings.baseURL
+            + "api/metric/"
+            + self.app_id
+            + "/"
+            + self.collection_id
+            + "/dataframe",
+            headers={"Authorization": "Bearer " + settings.token},
+        )
 
         if response.json()["code"] == 200:
             df = dataframe.copy()
@@ -119,55 +141,71 @@ class _DataFrame:
                     else:
                         raise TypeError
                 except TypeError as error:
-                    print('The column {0} is not a string'.format(i))
+                    print("The column {0} is not a string".format(i))
                     return dataframe
 
             # Makes all the columns lowercase
             dataframe = dataframe.rename(columns=str.lower)
 
             try:
-                dataframe = dataframe.applymap(lambda x: pd.to_numeric(x, errors='ignore'))
+                dataframe = dataframe.applymap(
+                    lambda x: pd.to_numeric(x, errors="ignore")
+                )
             except:
                 pass
 
             # removes all double spaces in column name
-            dataframe.columns = dataframe.columns.str.replace('\s?\s+', ' ', regex=True)
+            dataframe.columns = dataframe.columns.str.replace("\s?\s+", " ", regex=True)
             # Replaces all spaces with underscores
-            dataframe.columns = dataframe.columns.str.replace(' ', '_')
+            dataframe.columns = dataframe.columns.str.replace(" ", "_")
             # Replaces all 'streepjes' with underscores
-            dataframe.columns = dataframe.columns.str.replace('-', '_')
+            dataframe.columns = dataframe.columns.str.replace("-", "_")
             # Removes all spaces at the start and end
             dataframe.columns = dataframe.columns.str.strip()
 
-            exceptions = {'ü': 'u', 'ä': 'a', 'ö': 'o', 'ë': 'e', 'ï': 'i', '%': '_procent_', '&': '_and_'}
+            exceptions = {
+                "ü": "u",
+                "ä": "a",
+                "ö": "o",
+                "ë": "e",
+                "ï": "i",
+                "%": "_procent_",
+                "&": "_and_",
+            }
 
             for v, k in exceptions.items():
                 df.columns = df.columns.str.replace(v, k)
 
-            df.columns = df.columns.str.replace('__', '_')
+            df.columns = df.columns.str.replace("__", "_")
 
             # removes all the values that Javascript doesnt allow
-            dataframe.columns = dataframe.columns.str.replace('[^0-9_$a-z]', '', regex=True)
+            dataframe.columns = dataframe.columns.str.replace(
+                "[^0-9_$a-z]", "", regex=True
+            )
 
             # trimms all values
             dataframe = dataframe.applymap(lambda x: x.strip() if type(x) == str else x)
-            dataframe = dataframe.applymap(lambda x: ' '.join(x.split()) if type(x) == str else x)
+            dataframe = dataframe.applymap(
+                lambda x: " ".join(x.split()) if type(x) == str else x
+            )
 
             for i in dataframe:
                 l = i
                 try:
-                    if re.match(r'[^_$a-z]', i[0]) or re.match(r'_', i[-1]):
-                        while re.match(r'[^_$a-z]', i[0]):
+                    if re.match(r"[^_$a-z]", i[0]) or re.match(r"_", i[-1]):
+                        while re.match(r"[^_$a-z]", i[0]):
                             i = i[1:]
-                            if re.match(r'_', i[0]):
+                            if re.match(r"_", i[0]):
                                 i = i[1:]
 
-                        while re.match(r'_', i[-1]):
+                        while re.match(r"_", i[-1]):
                             i = i[:-1]
                         df.rename(columns={original: i}, inplace=True)
 
                 except IndexError as error:
-                    return 'the column {0} contains no letter, underscore or dollar sign'.format(l)
+                    return "the column {0} contains no letter, underscore or dollar sign".format(
+                        l
+                    )
             try:
                 dup_columns = dataframe.columns[dataframe.columns.duplicated()]
                 if not dup_columns.any():
@@ -176,28 +214,52 @@ class _DataFrame:
                     raise TypeError
             except TypeError as error:
                 dup_columns = list(set(dup_columns))
-                return 'There are multiple column(s) %s' % dup_columns
+                return "There are multiple column(s) %s" % dup_columns
 
-            monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
-            shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
+            monthname = "january|february|march|april|may|june|july|august|september|october|november|december"
+            shortmonts = (
+                "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july"
+            )
 
-            day = r'((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}'
-            month = r'((1[0-2]){1}|(0?[1-9]){1}){1}'
-            year = r'([12]{1}[0-9]{3}){1}'
-            hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
+            day = r"((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}"
+            month = r"((1[0-2]){1}|(0?[1-9]){1}){1}"
+            year = r"([12]{1}[0-9]{3}){1}"
+            hms = r"(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}"
 
             date_dict = {
-                r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-                r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-                r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
-                r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
-                r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
-                '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
-                '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
-                '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
-                '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
-                '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
-                '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
+                r"\b("
+                + year
+                + "-{1}"
+                + month
+                + "-{1}"
+                + day
+                + " "
+                + hms
+                + r")\b": "%Y-%m-%d %H:%M:%S",
+                r"\b("
+                + year
+                + "-{1}"
+                + day
+                + "-{1}"
+                + month
+                + " "
+                + hms
+                + r")\b": "%Y-%m-%d %H:%M:%S",
+                r"\b(" + day + "/{1}" + month + "/{1}" + year + r")\b": "%d/%m/%Y",
+                r"\b(" + month + "/{1}" + day + "/{1}" + year + r")\b": "%m/%d/%Y",
+                r"\b(" + year + "/{1}" + month + "/{1}" + day + r")\b": "%Y/%m/%d",
+                "((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))": "%d-%m-%Y",
+                "((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))": "%m-%d-%Y",
+                "(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))": "%Y-%m-%d",
+                "("
+                + monthname
+                + " (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))": "%B %d, %Y",
+                "(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) "
+                + monthname
+                + ")": "%Y, %d %B",
+                "([12][0-9]{3}, ("
+                + monthname
+                + ") (3[01]|[12][0-9]|[1-9]))": "%Y, %B %d",
             }
 
             strings = []
@@ -209,11 +271,16 @@ class _DataFrame:
                 try:
                     a = dataframe[i].unique()
                 except:
-                    dataframe[i] = dataframe[i].apply(lambda x: [x] if type(x) is not np.ndarray else x)
+                    dataframe[i] = dataframe[i].apply(
+                        lambda x: [x] if type(x) is not np.ndarray else x
+                    )
                     lists.append(i)
                 else:
                     r = r"(" + ")|(".join(date_dict) + ")"
-                    if all(isinstance(element, (np.int64, np.float64, int, float)) for element in a):
+                    if all(
+                        isinstance(element, (np.int64, np.float64, int, float))
+                        for element in a
+                    ):
                         numbers.append(i)
                     elif all(isinstance(element, str) for element in a):
                         temp = []
@@ -231,65 +298,98 @@ class _DataFrame:
             for i in dates:
                 for k in date_dict.keys():
                     dataframe[i] = dataframe[i].apply(
-                        lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
-                            re.match(k, x, flags=re.IGNORECASE)) else x)
+                        lambda x: time.mktime(
+                            datetime.strptime(x, date_dict[k]).timetuple()
+                        )
+                        if type(x) == str and (re.match(k, x, flags=re.IGNORECASE))
+                        else x
+                    )
 
             for index, (first, second) in enumerate(zip(df.columns, dataframe.columns)):
                 if first != second:
-                    print(first, 'has been changed to', second)
+                    print(first, "has been changed to", second)
 
             dataframe.reset_index(inplace=True, drop=True)
-            response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id, headers={
-                'Authorization': 'Bearer ' + settings.token
-            })
+            response = requests.get(
+                settings.baseURL
+                + "api/metric/"
+                + self.app_id
+                + "/"
+                + self.collection_id,
+                headers={"Authorization": "Bearer " + settings.token},
+            )
 
-            if 'index' in dataframe:
+            if "index" in dataframe:
                 dataframe = dataframe.drop(columns=["index"])
 
             def Worker(self, amountSent, offset, dataframe, count):
                 if not Auth.tokenValid():
                     Auth.refreshToken()
                 if (count + 1) % amountSent is 0:
-                    portion = dataframe.iloc[x - (amountSent - 1) - offset:x + 1 - offset]
+                    portion = dataframe.iloc[
+                        x - (amountSent - 1) - offset : x + 1 - offset
+                    ]
                     portion.reset_index(inplace=True, drop=True)
-                    if 'index' in portion:
+                    if "index" in portion:
                         portion = portion.drop(columns=["index"])
                     portion.index += offset + count + (amountSent + 1)
-                    items = json.loads(portion.to_json(orient='index'))
+                    items = json.loads(portion.to_json(orient="index"))
 
                     response = requests.post(
-                        settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
-                        json=items, headers={
-                            'Authorization': 'Bearer ' + settings.token
-                        })
+                        settings.baseURL
+                        + "api/metric/"
+                        + self.app_id
+                        + "/"
+                        + self.collection_id
+                        + "/dataframe",
+                        json=items,
+                        headers={"Authorization": "Bearer " + settings.token},
+                    )
                 elif len(dataframe.index) + offset == x + 1:
                     portion = dataframe.tail(
-                        len(dataframe.index) - int(math.floor(len(dataframe.index) / amountSent)) * amountSent)
+                        len(dataframe.index)
+                        - int(math.floor(len(dataframe.index) / amountSent))
+                        * amountSent
+                    )
                     portion.reset_index(inplace=True, drop=True)
-                    if 'index' in portion:
+                    if "index" in portion:
                         portion = portion.drop(columns=["index"])
                     portion.index += offset + count + (amountSent + 1)
-                    items = json.loads(portion.to_json(orient='index'))
+                    items = json.loads(portion.to_json(orient="index"))
                     response = requests.post(
-                        settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
-                        json=items, headers={
-                            'Authorization': 'Bearer ' + settings.token
-                        })
+                        settings.baseURL
+                        + "api/metric/"
+                        + self.app_id
+                        + "/"
+                        + self.collection_id
+                        + "/dataframe",
+                        json=items,
+                        headers={"Authorization": "Bearer " + settings.token},
+                    )
 
                 count += 1
 
             amountToSent = 100
             limit = 5000000 * 0.95 / 8
 
-            averageSize = getsizeof(dataframe.to_json(orient="index")) / len(dataframe.index)
-            amountSent = amountToSent if ((limit / averageSize) > amountToSent) else int(
-                math.floor(limit / averageSize))
+            averageSize = getsizeof(dataframe.to_json(orient="index")) / len(
+                dataframe.index
+            )
+            amountSent = (
+                amountToSent
+                if ((limit / averageSize) > amountToSent)
+                else int(math.floor(limit / averageSize))
+            )
 
             offset = response.json()["data"]["items"]
             count = 0
             threadlist = []
             for x in range(0 + offset, len(dataframe.index) + offset):
-                threadlist.append(Thread(target=Worker, args=(self, amountSent, offset, dataframe, count)))
+                threadlist.append(
+                    Thread(
+                        target=Worker, args=(self, amountSent, offset, dataframe, count)
+                    )
+                )
                 # used to be i % n_jobs == 0: <= Did NOT work now it does
                 if n_jobs == 0:
                     for thread in threadlist:
@@ -306,14 +406,18 @@ class _DataFrame:
         else:
             raise Exception(response.json()["message"])
 
-    def Append(self, dataframe, n_jobs = 1, show = False, delete_dup_columns = False):
+    def Append(self, dataframe, n_jobs=1, show=False, delete_dup_columns=False):
         if not Auth.tokenValid():
             Auth.refreshToken()
         df = dataframe.copy()
         dataframe = dataframe.fillna(value=np.nan)
 
         if n_jobs > multiprocessing.cpu_count() or n_jobs < -1:
-            print("The maximum CPU which can be used is: {0}".format(multiprocessing.cpu_count()))
+            print(
+                "The maximum CPU which can be used is: {0}".format(
+                    multiprocessing.cpu_count()
+                )
+            )
             return
 
         if not isinstance(show, bool):
@@ -331,87 +435,127 @@ class _DataFrame:
                 else:
                     raise TypeError
             except TypeError as error:
-                print('The column {0} is not a string'.format(i))
+                print("The column {0} is not a string".format(i))
                 return dataframe
 
         # Makes all the columns lowercase
         dataframe = dataframe.rename(columns=str.lower)
 
         try:
-            dataframe = dataframe.applymap(lambda x: pd.to_numeric(x, errors='ignore'))
+            dataframe = dataframe.applymap(lambda x: pd.to_numeric(x, errors="ignore"))
         except:
             pass
 
         # removes all dubble spaces in column name
-        dataframe.columns = dataframe.columns.str.replace('\s+', ' ', regex=True)
+        dataframe.columns = dataframe.columns.str.replace("\s+", " ", regex=True)
         # Replaces all spaces with underscores
-        dataframe.columns = dataframe.columns.str.replace(' ', '_')
+        dataframe.columns = dataframe.columns.str.replace(" ", "_")
         # Replaces all 'streepjes' with underscores
-        dataframe.columns = dataframe.columns.str.replace('-', '_')
+        dataframe.columns = dataframe.columns.str.replace("-", "_")
         # Removes all spaces at the start and end
         dataframe.columns = dataframe.columns.str.strip()
 
-        exceptions = {'ü': 'u', 'ä': 'a', 'ö': 'o', 'ë': 'e', 'ï': 'i', '%': '_procent_', '&': '_and_', ' ': '_', '-': '_'}
+        exceptions = {
+            "ü": "u",
+            "ä": "a",
+            "ö": "o",
+            "ë": "e",
+            "ï": "i",
+            "%": "_procent_",
+            "&": "_and_",
+            " ": "_",
+            "-": "_",
+        }
 
         for v, k in exceptions.items():
             dataframe.columns = dataframe.columns.str.replace(v, k)
 
         # removes all the values that Javascript doesnt allow
-        dataframe.columns = dataframe.columns.str.replace('[^0-9_$a-z]', '', regex=True)
+        dataframe.columns = dataframe.columns.str.replace("[^0-9_$a-z]", "", regex=True)
 
-        dataframe.columns = dataframe.columns.str.replace('_+', '_')
+        dataframe.columns = dataframe.columns.str.replace("_+", "_")
 
         # trimms all values
         dataframe = dataframe.applymap(lambda x: x.strip() if type(x) == str else x)
-        dataframe = dataframe.applymap(lambda x: ' '.join(x.split()) if type(x) == str else x)
-
+        dataframe = dataframe.applymap(
+            lambda x: " ".join(x.split()) if type(x) == str else x
+        )
 
         for i in dataframe:
             l = i
             try:
-                while re.match('[^$a-z]', i[0]):
+                while re.match("[^$a-z]", i[0]):
                     i = i[1:]
 
-                while re.match('_', i[-1]):
+                while re.match("_", i[-1]):
                     i = i[:-1]
                 dataframe.rename(columns={l: i}, inplace=True)
 
             except IndexError as error:
-                return 'the column {0} contains no letter, underscore or dollar sign'.format(l)
+                return "the column {0} contains no letter, underscore or dollar sign".format(
+                    l
+                )
         try:
             dup_columns = dataframe.columns[dataframe.columns.duplicated()]
             if not dup_columns.any():
                 pass
             elif delete_dup_columns is True:
-                dataframe = dataframe.loc[:,~dataframe.columns.duplicated()].copy()
+                dataframe = dataframe.loc[:, ~dataframe.columns.duplicated()].copy()
             else:
                 raise TypeError
         except TypeError as error:
             dup_columns = list(set(dup_columns))
-            return 'There are multiple column(s) %s' % dup_columns
+            return "There are multiple column(s) %s" % dup_columns
 
-        monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
-        shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
+        monthname = "january|february|march|april|may|june|july|august|september|october|november|december"
+        shortmonts = (
+            "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july"
+        )
 
-        day = r'((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}'
-        month = r'((1[0-2]){1}|(0?[1-9]){1}){1}'
-        year = r'([12]{1}[0-9]{3}){1}'
-        hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
-        timezone = r'\+00:00'
+        day = r"((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}"
+        month = r"((1[0-2]){1}|(0?[1-9]){1}){1}"
+        year = r"([12]{1}[0-9]{3}){1}"
+        hms = r"(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}"
+        timezone = r"\+00:00"
 
         date_dict = {
-            r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-            r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + timezone + r')\b': '%Y-%m-%d %H:%M:%S%z',
-            r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
-            r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
-            r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
-            '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
-            '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
-            '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
-            '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
-            '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
-            '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
+            r"\b("
+            + year
+            + "-{1}"
+            + month
+            + "-{1}"
+            + day
+            + " "
+            + hms
+            + r")\b": "%Y-%m-%d %H:%M:%S",
+            r"\b("
+            + year
+            + "-{1}"
+            + day
+            + "-{1}"
+            + month
+            + " "
+            + hms
+            + r")\b": "%Y-%m-%d %H:%M:%S",
+            r"\b("
+            + year
+            + "-{1}"
+            + month
+            + "-{1}"
+            + day
+            + " "
+            + hms
+            + timezone
+            + r")\b": "%Y-%m-%d %H:%M:%S%z",
+            r"\b(" + day + "/{1}" + month + "/{1}" + year + r")\b": "%d/%m/%Y",
+            r"\b(" + month + "/{1}" + day + "/{1}" + year + r")\b": "%m/%d/%Y",
+            r"\b(" + year + "/{1}" + month + "/{1}" + day + r")\b": "%Y/%m/%d",
+            "((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))": "%d-%m-%Y",
+            "((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))": "%m-%d-%Y",
+            "(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))": "%Y-%m-%d",
+            "(" + monthname + " (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))": "%B %d, %Y",
+            "(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) " + monthname + ")": "%Y, %d %B",
+            "([12][0-9]{3}, (" + monthname + ") (3[01]|[12][0-9]|[1-9]))": "%Y, %B %d",
         }
 
         strings = []
@@ -423,11 +567,16 @@ class _DataFrame:
             try:
                 a = dataframe[i].unique()
             except:
-                dataframe[i] = dataframe[i].apply(lambda x: [x] if type(x) is not np.ndarray else x)
+                dataframe[i] = dataframe[i].apply(
+                    lambda x: [x] if type(x) is not np.ndarray else x
+                )
                 lists.append(i)
             else:
                 r = r"(" + ")|(".join(date_dict) + ")"
-                if all(isinstance(element, (np.int64, np.float64, int, float)) for element in a):
+                if all(
+                    isinstance(element, (np.int64, np.float64, int, float))
+                    for element in a
+                ):
                     numbers.append(i)
                 elif all(isinstance(element, str) for element in a):
                     temp = []
@@ -445,20 +594,25 @@ class _DataFrame:
         for i in dates:
             for k in date_dict.keys():
                 dataframe[i] = dataframe[i].apply(
-                    lambda x: time.mktime(datetime.strptime(x[:19], date_dict[k]).timetuple()) if type(x) == str and (
-                        re.match(k, x, flags=re.IGNORECASE)) else x)
+                    lambda x: time.mktime(
+                        datetime.strptime(x[:19], date_dict[k]).timetuple()
+                    )
+                    if type(x) == str and (re.match(k, x, flags=re.IGNORECASE))
+                    else x
+                )
 
         if show == True:
             for index, (first, second) in enumerate(zip(df.columns, dataframe.columns)):
                 if first != second:
-                    print(first, 'has been changed to', second)
+                    print(first, "has been changed to", second)
 
         dataframe.reset_index(inplace=True, drop=True)
-        response = requests.get(settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id, headers={
-            'Authorization': 'Bearer ' + settings.token
-        })
+        response = requests.get(
+            settings.baseURL + "api/metric/" + self.app_id + "/" + self.collection_id,
+            headers={"Authorization": "Bearer " + settings.token},
+        )
 
-        if 'index' in dataframe:
+        if "index" in dataframe:
             dataframe = dataframe.drop(columns=["index"])
 
         def Worker(amountSent, offset, dataframe, x):
@@ -466,43 +620,61 @@ class _DataFrame:
                 Auth.refreshToken()
 
             if x + amountSent < len(dataframe.index):
-                portion = dataframe.iloc[x:x + amountSent]
+                portion = dataframe.iloc[x : x + amountSent]
                 portion.reset_index(inplace=True, drop=True)
-                if 'index' in portion:
+                if "index" in portion:
                     portion = portion.drop(columns=["index"])
                 portion.index += offset - 99
-                items = json.loads(portion.to_json(orient='index'))
+                items = json.loads(portion.to_json(orient="index"))
                 response = requests.post(
-                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
-                    json=items, headers={
-                        'Authorization': 'Bearer ' + settings.token
-                    })
+                    settings.baseURL
+                    + "api/metric/"
+                    + self.app_id
+                    + "/"
+                    + self.collection_id
+                    + "/dataframe",
+                    json=items,
+                    headers={"Authorization": "Bearer " + settings.token},
+                )
 
             elif x + amountSent >= len(dataframe.index):
-                portion = dataframe.iloc[x:len(dataframe.index)]
+                portion = dataframe.iloc[x : len(dataframe.index)]
                 portion.reset_index(inplace=True, drop=True)
-                if 'index' in portion:
+                if "index" in portion:
                     portion = portion.drop(columns=["index"])
                 portion.index += offset - 99
-                items = json.loads(portion.to_json(orient='index'))
+                items = json.loads(portion.to_json(orient="index"))
                 response = requests.post(
-                    settings.baseURL + 'api/metric/' + self.app_id + '/' + self.collection_id + '/dataframe',
-                    json=items, headers={
-                        'Authorization': 'Bearer ' + settings.token
-                    })
+                    settings.baseURL
+                    + "api/metric/"
+                    + self.app_id
+                    + "/"
+                    + self.collection_id
+                    + "/dataframe",
+                    json=items,
+                    headers={"Authorization": "Bearer " + settings.token},
+                )
 
         amountToSent = 100
         limit = 5000000 * 0.95 / 8
 
-        averageSize = getsizeof(dataframe.to_json(orient="index")) / len(dataframe.index)
-        amountSent = amountToSent if ((limit / averageSize) > amountToSent) else int(math.floor(limit / averageSize))
+        averageSize = getsizeof(dataframe.to_json(orient="index")) / len(
+            dataframe.index
+        )
+        amountSent = (
+            amountToSent
+            if ((limit / averageSize) > amountToSent)
+            else int(math.floor(limit / averageSize))
+        )
 
         offset = response.json()["data"]["items"]
         threadlist = []
 
         for x in range(0, len(dataframe.index), amountSent):
             offset = offset + amountSent
-            threadlist.append(Thread(target=Worker, args=(amountSent, offset, dataframe, x)))
+            threadlist.append(
+                Thread(target=Worker, args=(amountSent, offset, dataframe, x))
+            )
             if x % n_jobs == 0:
                 for thread in threadlist:
                     thread.start()
@@ -520,26 +692,44 @@ class _DataFrame:
         if not Auth.tokenValid():
             Auth.refreshToken()
 
-        monthname = 'january|february|march|april|may|june|july|august|september|october|november|december'
-        shortmonts = 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july'
+        monthname = "january|february|march|april|may|june|july|august|september|october|november|december"
+        shortmonts = (
+            "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|march|april|june|july"
+        )
 
-        day = r'((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}'
-        month = r'((1[0-2]){1}|(0?[1-9]){1}){1}'
-        year = r'([12]{1}[0-9]{3}){1}'
-        hms = r'(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}'
+        day = r"((3[01]){1}|([12][0-9]){1}|(0?[1-9]){1}){1}"
+        month = r"((1[0-2]){1}|(0?[1-9]){1}){1}"
+        year = r"([12]{1}[0-9]{3}){1}"
+        hms = r"(([2][0-3]){1}|([0-1][0-9]){1}){1}(:[0-5]{1}[0-9]{1}){2}"
 
         date_dict = {
-            r'\b(' + year + '-{1}' + month + '-{1}' + day + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-            r'\b(' + year + '-{1}' + day + '-{1}' + month + ' ' + hms + r')\b': '%Y-%m-%d %H:%M:%S',
-            r'\b(' + day + '/{1}' + month + '/{1}' + year + r')\b': '%d/%m/%Y',
-            r'\b(' + month + '/{1}' + day + '/{1}' + year + r')\b': '%m/%d/%Y',
-            r'\b(' + year + '/{1}' + month + '/{1}' + day + r')\b': '%Y/%m/%d',
-            '((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))': '%d-%m-%Y',
-            '((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))': '%m-%d-%Y',
-            '(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))': '%Y-%m-%d',
-            '(' + monthname + ' (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))': '%B %d, %Y',
-            '(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) ' + monthname + ')': '%Y, %d %B',
-            '([12][0-9]{3}, (' + monthname + ') (3[01]|[12][0-9]|[1-9]))': '%Y, %B %d',
+            r"\b("
+            + year
+            + "-{1}"
+            + month
+            + "-{1}"
+            + day
+            + " "
+            + hms
+            + r")\b": "%Y-%m-%d %H:%M:%S",
+            r"\b("
+            + year
+            + "-{1}"
+            + day
+            + "-{1}"
+            + month
+            + " "
+            + hms
+            + r")\b": "%Y-%m-%d %H:%M:%S",
+            r"\b(" + day + "/{1}" + month + "/{1}" + year + r")\b": "%d/%m/%Y",
+            r"\b(" + month + "/{1}" + day + "/{1}" + year + r")\b": "%m/%d/%Y",
+            r"\b(" + year + "/{1}" + month + "/{1}" + day + r")\b": "%Y/%m/%d",
+            "((3[01]|[12][0-9]|0?[1-9])-(1[0-2]|0?[1-9])-([12][0-9]{3}))": "%d-%m-%Y",
+            "((1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])-([12][0-9]{3}))": "%m-%d-%Y",
+            "(([12][0-9]{3})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0[1-9]))": "%Y-%m-%d",
+            "(" + monthname + " (3[01]|[12][0-9]|[1-9]), ([12][0-9]{3}))": "%B %d, %Y",
+            "(([12][0-9]{3}), (3[01]|[12][0-9]|[1-9]) " + monthname + ")": "%Y, %d %B",
+            "([12][0-9]{3}, (" + monthname + ") (3[01]|[12][0-9]|[1-9]))": "%Y, %B %d",
         }
 
         r = r"(" + ")|(".join(date_dict) + ")"
@@ -557,14 +747,18 @@ class _DataFrame:
                 for i in temp_date:
                     for dates in i:
                         if re.match(k, dates, flags=re.IGNORECASE):
-                            temp_unix_list.append(time.mktime(datetime.strptime(dates, v).timetuple()))
+                            temp_unix_list.append(
+                                time.mktime(datetime.strptime(dates, v).timetuple())
+                            )
                             temp_date_list.append(dates)
 
             print(temp_date_list)
             print(temp_unix_list)
 
-            for index, (first, second) in enumerate(zip(temp_date_list, temp_unix_list)):
-                filters = filters.replace("\"" + first + "\"", str(second))
+            for index, (first, second) in enumerate(
+                zip(temp_date_list, temp_unix_list)
+            ):
+                filters = filters.replace('"' + first + '"', str(second))
 
             # dataframe[i] = dataframe[i].apply(
             #     lambda x: time.mktime(datetime.strptime(x, date_dict[k]).timetuple()) if type(x) == str and (
@@ -578,16 +772,20 @@ class _DataFrame:
         maxLoops = 1
         while currentLoop < maxLoops:
             response = requests.post(
-                settings.baseURL + 'api/metric/query?offset=' + str(currentLoop * 500) + '&original=' + str(
-                    original).lower(), json={
+                settings.baseURL
+                + "api/metric/query?offset="
+                + str(currentLoop * 500)
+                + "&original="
+                + str(original).lower(),
+                json={
                     "app": self.app_id,
                     "collection": self.collection_id,
                     "filter": filters,
                     "projection": projection,
-                    "sorting": sorting
-                }, headers={
-                    'Authorization': 'Bearer ' + settings.token
-                })
+                    "sorting": sorting,
+                },
+                headers={"Authorization": "Bearer " + settings.token},
+            )
 
             if "total" in response.json().keys():
                 maxLoops = math.ceil(response.json()["total"] / 500)
@@ -605,21 +803,21 @@ class _DataFrame:
 
         if len(ItemIDArray) > 0:
 
-            x = {
-                "data": ItemIDArray
-            }
+            x = {"data": ItemIDArray}
 
             itemIDString = json.dumps(x)
 
-            response = requests.delete(settings.baseURL + "api/item/" + self.app_id + "/" + self.collection_id +"/dataframe/",
-                        json={
-                            "content": itemIDString,
-                            "key": uniqueKey
-                        },
-                        headers={
-                            'Authorization': 'Bearer ' + settings.token
-                        })
+            response = requests.delete(
+                settings.baseURL
+                + "api/item/"
+                + self.app_id
+                + "/"
+                + self.collection_id
+                + "/dataframe/",
+                json={"content": itemIDString, "key": uniqueKey},
+                headers={"Authorization": "Bearer " + settings.token},
+            )
         else:
-            raise Exception('No IDs to delete')
+            raise Exception("No IDs to delete")
 
         return response

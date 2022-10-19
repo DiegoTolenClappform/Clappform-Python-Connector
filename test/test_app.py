@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.app import App
 
+
 class TestApp(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -38,7 +39,12 @@ class TestApp(unittest.TestCase):
 
     def test_createOne(self):
         print("=====[ Creating one app in enviroment ]=====")
-        self.created_app = App.Create(id=self.app_id, name=self.app_name, description=self.app_desc, icon=self.app_icon)
+        self.created_app = App.Create(
+            id=self.app_id,
+            name=self.app_name,
+            description=self.app_desc,
+            icon=self.app_icon,
+        )
         print(self.created_app)
         assert self.created_app is not None
         print("=====[ Done creating one app in enviroment ]=====")
@@ -50,7 +56,9 @@ class TestApp(unittest.TestCase):
         assert self.updated_app is not None
         print("=====[ Done updating one app in enviroment ]=====")
 
-    def test_zdeleteOne(self): # Reason for the Z is so update goes first. unittesting works on alphabet
+    def test_zdeleteOne(
+        self,
+    ):  # Reason for the Z is so update goes first. unittesting works on alphabet
         print("=====[ Deleting one app in enviroment ]=====")
         self.deleted_app = Clappform.App("test_app").Delete()
         print(self.deleted_app)

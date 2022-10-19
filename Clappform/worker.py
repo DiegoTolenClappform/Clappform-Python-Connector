@@ -7,13 +7,11 @@ class Worker:
     """Helper functions to help with using the worker."""
 
     def __init__(self, env, action_flow, userid, redis_uri):
-        self.key = f'{env}_{action_flow}_{userid}'
+        self.key = f"{env}_{action_flow}_{userid}"
         self.r = redis.from_url(redis_uri)
 
     def Get(self, key: str):
-        return self.r.get(
-            f"{self.key}_{key}"
-        )
+        return self.r.get(f"{self.key}_{key}")
 
     def Set(self, key: str, value):
         return self.r.set(
@@ -22,9 +20,7 @@ class Worker:
         )
 
     def Keys(self):
-        return self.r.keys(
-            f"{self.key}_*"
-        )
+        return self.r.keys(f"{self.key}_*")
 
     @classmethod
     def from_getenv(cls, var="WORKER_TASK_OPTIONS"):

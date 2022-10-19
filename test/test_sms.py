@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.sms import SMS
 
+
 class TestSMS(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -30,9 +31,7 @@ class TestSMS(unittest.TestCase):
 
     def test_create(self):
         print("=====[ Sending SMS ]=====")
-        rep = SMS.Create(user='d.tolen@clappform.com', content='Data has been updated')
+        rep = SMS.Create(user="d.tolen@clappform.com", content="Data has been updated")
         print(rep)
         assert rep is not None
         print("=====[ Done sending SMS ]=====")
-
-
