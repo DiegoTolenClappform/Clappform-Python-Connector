@@ -239,7 +239,7 @@ class Transfer:
                                         form_id = action["template"]["id"]
                                         response = requests.get(
                                             settings.baseURL
-                                            + "api/form_template/"
+                                            + "api/questionnaire/"
                                             + str(form_id)
                                             + "?extended=true",
                                             headers={
@@ -298,7 +298,7 @@ class Transfer:
 
         # Get current version of framework api, web_application and web_server
         responseVersion = requests.get(
-            settings.baseURL + "api/version/",
+            settings.baseURL + "api/version",
             headers={"Authorization": "Bearer " + settings.token},
         )
         try:

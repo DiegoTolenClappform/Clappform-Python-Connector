@@ -38,7 +38,7 @@ Clappform.App.Read(extended=True)
 ```
 
 ### ReadOne
-The ReadOne() function returns a JSON object with the requested app. It's id needs to have been passed to the class in order to read the app. An exception will be raised upon not finding the app. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the collections in the app.
+The ReadOne() function returns a JSON object with the requested app. It's id needs to have been passed to the class in order to read the app. An exception will be raised upon not finding the app. Additionally the extended pa rameter can be passed (defaulting to False) in order to expand the data of the collections in the app.
 
 ```python
 Clappform.App("test_app").ReadOne(extended=True)
@@ -48,7 +48,7 @@ Clappform.App("test_app").ReadOne(extended=True)
 The Create() function returns an instance of the App class containing the correct id if the app has been created, otherwise it will raise an exception. For instance an exception will be thrown if the app already exists. The required parameters are: id (Unique, lowercase and seperation by underscores), name, description and icon (ex. "home-icon").
 
 ```python
-Clappform.App.Create(id="test_app", name="Test App", description="This app gives ... insights on ... subject.", icon="home-icon")
+Clappform.App.Create(id="test_app", name="Test App", description="This app gives ... insights on ... subject.", opts={})
 ```
 
 ### Update
@@ -74,10 +74,10 @@ Clappform.App("test_app").Collection("test_collection")
 
 ### Collection
 ### ReadOne
-The ReadOne() function returns a JSON object with the requested collection. It's slug needs to have been passed to the class in order to read the collection. An exception will be raised upon not finding the collection. Additionally the extended parameter can be passed (defaulting to False) in order to expand the data of the items in the collection. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
+The ReadOne() function returns a JSON object with the requested collection. It's slug needs to have been passed to the class in order to read the collection. An exception will be raised upon not finding the collection. Additionally an extended level parameter of `0` to `3` (default: `0`) can be passed in order to expand the data of the items in the collection. If the collection is locked, setting the 'original' parameter to equal `False` will show the data after the lock occured.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").ReadOne(extended=True, Original=True)
+Clappform.App("test_app").Collection("test_collection").ReadOne(extended=0, original=True)
 ```
 
 ### Create
@@ -95,7 +95,7 @@ Clappform.App("test_app").Collection("test_collection").Update(name="Collection"
 ```
 
 ### Delete
-The Delete() function returns True on successful deletion and otherwise throws an exception. For example, an exception will be thrown if the collection could not be found. The slug of the collection must have been passed to the class to delete the collection. If the collection is used by modules, the function returns an error message and two options are available: update the related module or delete it. To update the related modules, specify the parameters 'slug' and 'app'. To delete the related modules, set the 'delete' parameter to True. If neither option is set, the function refuses to delete the collection and returns a list of all modules associated with the collection. In case both update AND delete parameters are passed, the function overrides the delete.
+The Delete() function returns True on successful deletion and otherwise throws an exception. For example, an exception will be thrown if the collection could not be found. The slug of the collection must have been passed to the class to delete the collection. If the collection is used by modules, the function returns an error message and two options are available: update the related module or delete it. To update the related modules, specify the parameters 'slug' and 'app'. To delete the related modules, set the 'delete_modules' parameter to True. If neither option is set, the function refuses to delete the collection and returns a list of all modules associated with the collection. In case both update AND delete parameters are passed, the function overrides the delete.
 
 ```python
 Clappform.App("test_app").Collection("test_collection").Delete()
@@ -104,7 +104,7 @@ Clappform.App("test_app").Collection("test_collection").Delete()
 Clappform.App("test_app").Collection("test_collection").Delete(slug="new_collection_slug", app="new_app_id")
 ```
 ```python
-Clappform.App("test_app").Collection("test_collection").Delete(delete=True)
+Clappform.App("test_app").Collection("test_collection").Delete(delete_modules=True)
 ```
 ### Empty
 The Empty() function returns True upon successful emptying the collection and raises an exception otherwise. The collection's slug needs to have been passed to the class in order to empty the collection.
@@ -117,7 +117,7 @@ Clappform.App("test_app").Collection("test_collection").Empty()
 The Query() function returns a pandas dataframe with the data matching specified conditions stored in the collection. The options follow the MongoDB documentation. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").Query(filters={}, projection={}, sorting={}, original=True)
+Clappform.App("test_app").Collection("test_collection").Query(data_source='foo', query=[], name='Bar', slug='bar ', **kwargs)
 ```
 
 ### Lock
@@ -179,10 +179,10 @@ Clappform.App("test_app").Collection("test_collection").Item("test_item").Delete
 
 ## DataFrame
 ### Read
-The Read() function returns a pandas dataframe with all the data stored in the collection in iterations using yield. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured. The parameter 'n_jobs' is the amount of threads that will be used.
+The Read() function returns a pandas dataframe with all the data stored in the collection in iterations using yield. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
 
 ```python
-for data in Clappform.App("test_app").Collection("test_collection").DataFrame().Read(Original=True, n_jobs = 1):
+for data in Clappform.App("test_app").Collection("test_collection").DataFrame().Read(Original=True):
     print(data)
 ```
 
@@ -216,7 +216,7 @@ Clappform.App("test_app").Collection("test_collection").DataFrame().Append(dataf
 The Query() function returns a pandas dataframe with the data matching specified conditions stored in the collection. The options follow the MongoDB documentation. It is necessary to have all columns (except id) in the data property if changing the projection. The collection's slug needs to have been passed to the collection class in order to retrieve the dataframe. If the collection is locked, setting the 'Original' parameter to equal False will show the data after the lock occured.
 
 ```python
-Clappform.App("test_app").Collection("test_collection").DataFrame().Query(filters={}, projection={}, sorting={}, original=True)
+Clappform.App("test_app").Collection("test_collection").DataFrame().Query(filters={}, projection={},  sorting={}, original=True)
 ```
 
 ## Notification

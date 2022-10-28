@@ -19,7 +19,7 @@ class Actionflow:
         json_body = {"actionflowid": actionflowid, "user": 2}
 
         response = requests.post(
-            settings.baseURL + "api/action_flow/start",
+            settings.baseURL + "api/actionflow/start",
             json_body,
             headers={"Authorization": "Bearer " + settings.token},
         )
