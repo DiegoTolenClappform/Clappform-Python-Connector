@@ -8,11 +8,11 @@ from .settings import settings
 
 # These are global vars and need to be filled in when you want to test the package. Then also need to be removed when pushing to git
 settings
-settings.baseURL = ""
-settings.password = ""
-settings.username = ""
-settings.usertestingpassword = ""
-settings.usertestingemail = ""
+settings.baseURL = "http://localhost/"
+settings.password = "Migration12!"
+settings.username = "d.tolen@clappform.com"
+settings.usertestingpassword = "Migration12!"
+settings.usertestingemail = "d.tolen@clappform.com"
 settings.twilliotemplate = ""
 
 ##### TO-DO #####

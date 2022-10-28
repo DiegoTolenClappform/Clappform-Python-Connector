@@ -23,7 +23,7 @@ class Auth:
 
     def refreshToken():
         response = requests.post(
-            settings.baseURL + "api/user/auth",
+            settings.baseURL + "api/auth",
             json={"username": __USERNAME__, "password": __PASSWORD__},
         )
         settings.token = response.json()["data"]["access_token"]

@@ -22,7 +22,7 @@ class Query:
 
         response_total = requests.request(
             "POST",
-            settings.baseURL + "api/read_data?total_count=true",
+            settings.baseURL + "api/dataframe/read_data?total_count=true",
             headers={"Authorization": "Bearer " + settings.token},
             data=body,
         )
@@ -38,7 +38,7 @@ class Query:
                 try:
                     response = requests.request(
                         "POST",
-                        settings.baseURL + "api/read_data?total_count=false",
+                        settings.baseURL + "api/dataframe/read_data",
                         headers={"Authorization": "Bearer " + settings.token},
                         data=body,
                     )

@@ -17,7 +17,7 @@ class TestApp(unittest.TestCase):
         self.app_id = "test_app"
         self.app_name = "Test App"
         self.app_desc = "This app gives ... insights on ... subject."
-        self.app_icon = "home-icon"
+        self.app_opts = {"spam": "eggs"}
         self.app_updated_name = "test case update"
         self.created_app = ""
         self.updated_app = ""
@@ -43,7 +43,7 @@ class TestApp(unittest.TestCase):
             id=self.app_id,
             name=self.app_name,
             description=self.app_desc,
-            icon=self.app_icon,
+            opts=self.app_opts,
         )
         print(self.created_app)
         assert self.created_app is not None

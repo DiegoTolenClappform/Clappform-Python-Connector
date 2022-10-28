@@ -19,7 +19,7 @@ class _Item:
 
         response = requests.get(
             settings.baseURL
-            + "api/metric/"
+            + "api/item/"
             + self.app_id
             + "/"
             + self.collection_id
@@ -30,22 +30,22 @@ class _Item:
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return response.json()["data"]
         else:
             raise Exception(response.json()["message"])
 
-    def Create(self, id, data):
+    def Create(self, data):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         response = requests.post(
-            settings.baseURL + "api/metric/" + self.app_id + "/" + self.collection_id,
-            json={"id": id, "data": data},
+            settings.baseURL + "api/item/" + self.app_id + "/" + self.collection_id,
+            json={"data": data},
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return _Item(self.app_id, self.collection_id, id)
         else:
             raise Exception(response.json()["message"])
@@ -56,7 +56,7 @@ class _Item:
 
         response = requests.put(
             settings.baseURL
-            + "api/metric/"
+            + "api/item/"
             + self.app_id
             + "/"
             + self.collection_id
@@ -66,7 +66,7 @@ class _Item:
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return _Item(self.app_id, self.collection_id, id)
         else:
             raise Exception(response.json()["message"])
@@ -77,7 +77,7 @@ class _Item:
 
         response = requests.delete(
             settings.baseURL
-            + "api/metric/"
+            + "api/item/"
             + self.app_id
             + "/"
             + self.collection_id
@@ -86,7 +86,7 @@ class _Item:
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return True
         else:
             raise Exception(response.json()["message"])

@@ -21,14 +21,16 @@ class _Collection:
     def Item(self, item=None):
         return _Item(self.app_id, self.id, item)
 
-    def ReadOne(self, extended=False, original=True):
+    def ReadOne(self, extended=0, original=True):
+        if extended not in range(4):
+            raise ValueError(f"extended not in {list(range(4))}, got {extended}")
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         extended = str(extended).lower()
         response = requests.get(
             settings.baseURL
-            + "api/metric/"
+            + "api/collection/"
             + self.app_id
             + "/"
             + self.id
@@ -39,7 +41,7 @@ class _Collection:
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is not 200:
+        if response.json()["code"] != 200:
             raise Exception(response.json()["message"])
 
         result = response.json()
@@ -53,11 +55,13 @@ class _Collection:
             while currentLoop < maxLoops:
                 response = requests.get(
                     settings.baseURL
-                    + "api/metric/"
+                    + "api/collection/"
                     + self.app_id
                     + "/"
                     + self.id
-                    + "?extended=true&offset="
+                    + "?extended="
+                    + extended
+                    + "&offset="
                     + str(currentLoop * 500)
                     + "&original="
                     + str(original).lower(),
@@ -81,7 +85,7 @@ class _Collection:
             Auth.refreshToken()
 
         response = requests.post(
-            settings.baseURL + "api/metric/" + self.app_id,
+            settings.baseURL + "api/collection/" + self.app_id,
             json={
                 "slug": slug,
                 "name": name,
@@ -93,7 +97,7 @@ class _Collection:
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return _Collection(self.app_id, id)
         else:
             raise Exception(response.json()["message"])
@@ -130,17 +134,17 @@ class _Collection:
             properties["sources"] = sources
 
         response = requests.put(
-            settings.baseURL + "api/metric/" + self.app_id + "/" + self.id,
+            settings.baseURL + "api/collection/" + self.app_id + "/" + self.id,
             json=properties,
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return _Collection(self.app_id, id)
         else:
             raise Exception(response.json()["message"])
 
-    def Delete(self, slug=None, app=None, delete=None):
+    def Delete(self, slug=None, app=None, delete_modules=None):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -151,16 +155,16 @@ class _Collection:
         if app is not None:
             properties["overwrite_app"] = app
 
-        if delete is not None:
+        if delete_modules is not None:
             properties["delete_modules"] = True
 
         response = requests.delete(
-            settings.baseURL + "api/metric/" + self.app_id + "/" + self.id,
+            settings.baseURL + "api/collection/" + self.app_id + "/" + self.id,
             json=properties,
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             if "data" in response.json():
                 raise Exception(response.json())
             return True
@@ -173,7 +177,7 @@ class _Collection:
 
         response = requests.delete(
             settings.baseURL
-            + "api/metric/"
+            + "api/collection/"
             + self.app_id
             + "/"
             + self.id
@@ -181,7 +185,7 @@ class _Collection:
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return True
         else:
             raise Exception(response.json()["message"])
@@ -191,12 +195,12 @@ class _Collection:
             Auth.refreshToken()
 
         response = requests.put(
-            settings.baseURL + "api/metric/" + self.app_id + "/" + self.id,
+            settings.baseURL + "api/collection/" + self.app_id + "/" + self.id,
             json={"locked": True},
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return True
         else:
             raise Exception(response.json()["message"])
@@ -206,17 +210,17 @@ class _Collection:
             Auth.refreshToken()
 
         response = requests.put(
-            settings.baseURL + "api/metric/" + self.app_id + "/" + self.id,
+            settings.baseURL + "api/collection/" + self.app_id + "/" + self.id,
             json={"locked": False},
             headers={"Authorization": "Bearer " + settings.token},
         )
 
-        if response.json()["code"] is 200:
+        if response.json()["code"] == 200:
             return True
         else:
             raise Exception(response.json()["message"])
 
-    def Query(self, filters={}, projection={}, sorting={}, original=True):
+    def Query(self, data_source: str, query: list, name: str, slug: str, **kwargs):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
@@ -225,19 +229,24 @@ class _Collection:
         currentLoop = 0
         maxLoops = 1
         while currentLoop < maxLoops:
+            body = {
+                "data_source": data_source,
+                "query": query,
+                "name": name,
+                "slug": slug,
+                "app": self.app_id,
+                "collection": self.id,
+            }
+            for kwarg, value in kwargs.items():
+                body[kwarg] = value
+
             response = requests.post(
                 settings.baseURL
-                + "api/metric/query?offset="
+                + "api/query?offset="
                 + str(currentLoop * 500)
                 + "&original="
                 + str(original).lower(),
-                json={
-                    "app": self.app_id,
-                    "collection": self.id,
-                    "filter": filters,
-                    "projection": projection,
-                    "sorting": sorting,
-                },
+                json=body,
                 headers={"Authorization": "Bearer " + settings.token},
             )
 
