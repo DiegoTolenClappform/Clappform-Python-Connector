@@ -15,7 +15,7 @@ from .worker import Worker
 
 settings
 settings.token = ""
-__version__ = "1.10.0"
+__version__ = "1.11.0"
 __author__ = "Clappform"
 __email__ = "info@clappform.com"
 __license__ = "MIT"

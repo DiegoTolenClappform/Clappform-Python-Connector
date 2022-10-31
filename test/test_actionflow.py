@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.actionflow import Actionflow
 
+
 class TestActionflow(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars

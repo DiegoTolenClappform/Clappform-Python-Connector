@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.whatsapp import Whatsapp
 
+
 class TestWhatsapp(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -32,9 +33,9 @@ class TestWhatsapp(unittest.TestCase):
 
     def test_create(self):
         print("=====[ Sending Whatsapp ]=====")
-        rep = Whatsapp.Create(user='d.tolen@clappform.com', content='Data has been updated')
+        rep = Whatsapp.Create(
+            user="d.tolen@clappform.com", content="Data has been updated"
+        )
         print(rep)
         assert rep is not None
         print("=====[ Done sending Whatsapp ]=====")
-
-

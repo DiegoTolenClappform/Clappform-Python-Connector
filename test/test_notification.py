@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.notification import Notification
 
+
 class TestNotification(unittest.TestCase):
     global notification_id
 
@@ -34,7 +35,11 @@ class TestNotification(unittest.TestCase):
 
     def test_create(self):
         print("=====[ Sending Notification ]=====")
-        rep = Notification.Create(user='d.tolen@clappform.com', content='Data has been updated', url='/app/default')
+        rep = Notification.Create(
+            user="d.tolen@clappform.com",
+            content="Data has been updated",
+            url="/app/default",
+        )
         print(rep)
         TestNotification.notification_id = rep
         assert rep is not None
@@ -56,4 +61,3 @@ class TestNotification(unittest.TestCase):
     #     print(rep)
     #     assert rep is True
     #     print("=====[ Done deleting Notification ]=====")
-

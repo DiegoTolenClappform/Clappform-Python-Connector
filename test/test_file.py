@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.file import File
 
+
 class TestFile(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -33,4 +34,3 @@ class TestFile(unittest.TestCase):
         # rep = File.AppendParquet()
         # assert rep is not None
         print("=====[ Done testing File append ]=====")
-

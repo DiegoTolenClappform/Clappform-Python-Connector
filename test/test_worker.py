@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 
-from context import Clappform
+from .context import Clappform
 from Clappform.worker import Worker
 
 

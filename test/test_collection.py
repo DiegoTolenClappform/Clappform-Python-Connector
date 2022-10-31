@@ -6,6 +6,7 @@ from .context import Clappform
 from .settings import settings
 from Clappform.app import App
 
+
 class TestCollection(unittest.TestCase):
     def setUp(self):
         # Set up all needed vars
@@ -29,24 +30,44 @@ class TestCollection(unittest.TestCase):
     def test_readOne(self):
         print("=====[ Reading one collection in enviroment ]=====")
         print(App("clappform_logs").Collection("api_logs").ReadOne(extended=True))
-        assert App("clappform_logs").Collection("api_logs").ReadOne(extended=True) is not None
+        assert (
+            App("clappform_logs").Collection("api_logs").ReadOne(extended=True)
+            is not None
+        )
         print("=====[ Done reading one collection in enviroment ]=====")
 
     def test_createOne(self):
         print("=====[ Creating one collection in enviroment ]=====")
-        self.created_collection = App("default").Collection().Create(slug=self.collection_id, name=self.collection_desc, description=self.collection_desc, encryption=self.collection_encryption, logging=self.collection_logging, sources=self.collection_sources)
+        self.created_collection = (
+            App("default")
+            .Collection()
+            .Create(
+                slug=self.collection_id,
+                name=self.collection_desc,
+                description=self.collection_desc,
+                encryption=self.collection_encryption,
+                logging=self.collection_logging,
+                sources=self.collection_sources,
+            )
+        )
         print(self.created_collection)
         assert self.created_collection is not None
         print("=====[ Done creating one collection in enviroment ]=====")
 
     def test_updateOne(self):
         print("=====[ Updating one collection in enviroment ]=====")
-        self.updated_collection = App("default").Collection(self.collection_id).Update(name=self.collection_updated_name)
+        self.updated_collection = (
+            App("default")
+            .Collection(self.collection_id)
+            .Update(name=self.collection_updated_name)
+        )
         print(self.updated_collection)
         assert self.updated_collection is not None
         print("=====[ Done updating one collection in enviroment ]=====")
 
-    def test_zdeleteOne(self): # Reason for the Z is so update goes first. unittesting works on alphabet
+    def test_zdeleteOne(
+        self,
+    ):  # Reason for the Z is so update goes first. unittesting works on alphabet
         print("=====[ Deleting one collection in enviroment ]=====")
         self.deleted_collection = App("default").Collection(self.collection_id).Delete()
         print(self.deleted_collection)
@@ -76,7 +97,11 @@ class TestCollection(unittest.TestCase):
 
     def test_query(self):
         print("=====[ Querying one collection in enviroment ]=====")
-        test = App("clappform_logs").Collection("api_logs").Query(filters={}, projection={}, sorting={}, original=True)
+        test = (
+            App("clappform_logs")
+            .Collection("api_logs")
+            .Query(filters={}, projection={}, sorting={}, original=True)
+        )
         print(test)
         assert test is not None
         print("=====[ Done querying one collection in enviroment ]=====")
