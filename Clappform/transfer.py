@@ -166,11 +166,11 @@ class Transfer:
         response = requests.post(
             url,
             json={
-                "apps": json.dumps(app_json, separators=(",", ":")),
-                "collections": json.dumps(collection_json, separators=(",", ":")),
-                "form_templates": json.dumps(formtemplate_json, separators=(",", ":")),
-                "action_flows": json.dumps(actionflow_json, separators=(",", ":")),
-                "import_entry": json.dumps(import_json, separators=(",", ":")),
+                "apps": app_json,
+                "collections": collection_json,
+                "form_templates": formtemplate_json,
+                "action_flows": actionflow_json,
+                "import_entry": import_json,
                 "delete_mongo_data": dataexport,
             },
             headers={"Authorization": "Bearer " + settings.token},

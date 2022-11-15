@@ -9,19 +9,20 @@ class User:
     def __init__(self, user=None):
         self.id = user
 
-    def Create(clappformuri, email, firstname, lastname, phone, password):
+    def Create(email, firstname, lastname, phone, password, roles = ["public"], extra_information = {} ):
         if not Auth.tokenValid():
             Auth.refreshToken()
 
         response = requests.post(
-            clappformuri + "api/user",
+            settings.baseURL + "api/user",
             json={
                 "email": email,
+                "extra_information": extra_information,
                 "first_name": firstname,
                 "last_name": lastname,
                 "phone": phone,
                 "password": password,
-                "roles": ["public"],
+                "roles": roles,
             },
             headers={"Authorization": "Bearer " + settings.token},
         )

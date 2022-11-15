@@ -43,17 +43,9 @@ class Email:
         else:
             raise Exception(response.json()["message"])
 
-    def Create(templateid, tojson, templatejson, fromjson):
+    def Create(TemplateID, RecipientData, TemplateData, SenderData):
         if not Auth.tokenValid():
             Auth.refreshToken()
-
-        data = {
-            "template_id": templateid,
-            "personalizations": [
-                {"to": [tojson], "dynamic_template_data": templatejson}
-            ],
-            "from": fromjson,
-        }
 
         response = requests.get(
             settings.baseURL + "api/message/key",
@@ -62,13 +54,26 @@ class Email:
         if response.status_code != 200:
             return "Not able to get API key"
 
-        rep = requests.post(
-            "https://api.sendgrid.com/v3/mail/send",
-            json=data,
-            headers={"Authorization": "Bearer " + response.json()["data"]["API_key"]},
-        )
+        SendGridURL = "https://api.sendgrid.com/v3/mail/send"
+        payload = json.dumps({
+        "personalizations": [
+            {
+            "to": [RecipientData],
+            "dynamic_template_data": TemplateData
+            }
+        ],
+        "from": SenderData,
+        "template_id": TemplateID
+        })
 
-        if rep.status_code is 202:
+        headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + response.json()["data"]["API_key"]
+        }
+
+        response = requests.post(SendGridURL, json=payload, headers=headers)
+
+        if response.status_code is 202:
             return "Mail is send"
         else:
-            return rep.json()
+            return response.text
